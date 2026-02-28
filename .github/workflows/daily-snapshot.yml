@@ -2,8 +2,8 @@ name: Daily Snapshot Update
 
 on:
   schedule:
-    # 每天 UTC 12:30 = 北京时间 20:30（盘后数据更新后）
-    - cron: '30 12 * * 1-5'
+    # 每天 UTC 12:00 = 北京时间 20:00（盘后数据更新）
+    - cron: '0 12 * * 1-5'
   workflow_dispatch:
 
 permissions:
