@@ -12,24 +12,14 @@
 
 **无需注册、无需 Token、无需安装 Python 包**，仅需 Python 3 标准库。
 
-数据由 [恢恢量化](https://hhxg.top) 每个交易日 **20:00** 更新，覆盖 5000+ 只 A 股。
+数据由 [恢恢量化](https://hhxg.top) 每个交易日 **20:00**前更新，覆盖A股多因子策略。
 
 ---
 
 ## 安装（一键复制）
 
 ```bash
-mkdir -p ~/.claude/skills/hhxg-market/{scripts,references} && \
-curl -sL https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/skill/SKILL.md \
-  -o ~/.claude/skills/hhxg-market/SKILL.md && \
-curl -sL https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/skill/scripts/fetch_snapshot.py \
-  -o ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py && \
-curl -sL https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/skill/references/data-schema.md \
-  -o ~/.claude/skills/hhxg-market/references/data-schema.md && \
-curl -sL https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/skill/references/scheduled-fetch.md \
-  -o ~/.claude/skills/hhxg-market/references/scheduled-fetch.md && \
-chmod +x ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py && \
-echo "✅ hhxg-market skill 安装完成，重启 Claude Code 即可使用"
+git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git ~/.claude/skills/hhxg-market
 ```
 
 ---
@@ -51,19 +41,12 @@ echo "✅ hhxg-market skill 安装完成，重启 Claude Code 即可使用"
 
 ### 触发词
 
-以下关键词会自动触发 skill：
-
 | 类别 | 触发词 |
 |------|--------|
-| 大盘 | 今天 A 股怎么样、今天市场如何、大盘怎么样 |
-| 日报 | A 股日报、A 股复盘、盘后复盘、盘后总结 |
-| 情绪 | 市场情绪、赚钱效应、涨跌分布 |
-| 题材 | 热门题材、热门概念、主线题材 |
-| 连板 | 连板天梯、最高连板、涨停板、连板股 |
-| 游资 | 龙虎榜、游资动向、游资席位、知名游资 |
-| 资金 | 行业资金流向、板块资金、强势板块、弱势板块 |
-| 新闻 | 焦点新闻、市场新闻、今日要闻 |
-| 速览 | 股市快报、股市速递、市场快照、每日快报 |
+| 大盘 | 今天 A 股怎么样、大盘怎么样 |
+| 日报 | A 股日报、盘后复盘 |
+| 数据 | 热门题材、连板天梯、龙虎榜 |
+| 资金 | 行业资金流向、焦点新闻、赚钱效应 |
 
 ### 终端独立使用
 
@@ -71,15 +54,15 @@ echo "✅ hhxg-market skill 安装完成，重启 Claude Code 即可使用"
 
 ```bash
 # 完整快照
-python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py
+python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py
 
 # 只看特定板块
-python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py market   # 赚钱效应
-python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py themes   # 热门题材
-python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py ladder   # 连板天梯
-python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py hotmoney # 游资龙虎榜
-python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py sectors  # 行业资金
-python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py news     # 焦点新闻
+python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py market   # 赚钱效应
+python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py themes   # 热门题材
+python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py ladder   # 连板天梯
+python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py hotmoney # 游资龙虎榜
+python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py sectors  # 行业资金
+python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py news     # 焦点新闻
 ```
 
 ---
@@ -108,16 +91,14 @@ rm -rf ~/.claude/skills/hhxg-market
 ## 文件结构
 
 ```
-skill/
-├── SKILL.md                    # Skill 定义文件
-├── scripts/
-│   └── fetch_snapshot.py       # 零依赖获取脚本（仅用 Python 3 标准库）
-├── references/
-│   ├── data-schema.md          # JSON 数据结构说明
-│   └── scheduled-fetch.md      # 定时任务配置指南
-└── references/
-    ├── data-schema.md          # JSON 数据结构说明
-    └── scheduled-fetch.md      # 定时任务配置指南（可选）
+├── README.md
+├── LICENSE
+└── skill/
+    ├── SKILL.md                # Skill 定义文件
+    ├── scripts/
+    │   └── fetch_snapshot.py   # 零依赖获取脚本（仅用 Python 3 标准库）
+    └── references/
+        └── data-schema.md      # JSON 数据结构说明
 ```
 
 ---
