@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import json
 from unittest.mock import patch
 
-import httpx
 import pytest
 
 from hhxg.client import HhxgClient
@@ -25,7 +23,6 @@ class TestHhxgClient:
     def test_cache_hit(self, snapshot_json: dict) -> None:
         client = HhxgClient()
         call_count = 0
-        original = client._fetch_json
 
         def counting_fetch():
             nonlocal call_count
@@ -73,9 +70,11 @@ class TestHhxgClient:
         def raise_network():
             raise NetworkError("HTTP 500 from https://hhxg.top/...")
 
-        with patch.object(client, "_fetch_json", side_effect=raise_network):
-            with pytest.raises(NetworkError, match="500"):
-                client.get_snapshot()
+        with (
+            patch.object(client, "_fetch_json", side_effect=raise_network),
+            pytest.raises(NetworkError, match="500"),
+        ):
+            client.get_snapshot()
 
     def test_network_error_on_connection_failure(self) -> None:
         client = HhxgClient()
@@ -83,15 +82,19 @@ class TestHhxgClient:
         def raise_network():
             raise NetworkError("Request failed: Connection refused")
 
-        with patch.object(client, "_fetch_json", side_effect=raise_network):
-            with pytest.raises(NetworkError, match="Connection refused"):
-                client.get_snapshot()
+        with (
+            patch.object(client, "_fetch_json", side_effect=raise_network),
+            pytest.raises(NetworkError, match="Connection refused"),
+        ):
+            client.get_snapshot()
 
     def test_schema_error_on_invalid_json(self) -> None:
         client = HhxgClient()
-        with patch.object(client, "_fetch_json", return_value={"meta": {}}):
-            with pytest.raises(SchemaError):
-                client.get_snapshot()
+        with (
+            patch.object(client, "_fetch_json", return_value={"meta": {}}),
+            pytest.raises(SchemaError),
+        ):
+            client.get_snapshot()
 
     def test_custom_base_url(self, snapshot_json: dict) -> None:
         custom_url = "https://mirror.example.com/snapshot.json"

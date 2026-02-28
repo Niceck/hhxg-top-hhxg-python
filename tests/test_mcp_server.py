@@ -8,7 +8,6 @@ import pytest
 
 from hhxg.models import Snapshot
 
-
 # Only run if mcp is installed
 pytest.importorskip("mcp")
 

@@ -28,7 +28,10 @@ from .formatters import (
 
 mcp = FastMCP(
     "hhxg",
-    instructions="A 股日报快照 — 零配置获取赚钱效应、热门题材、连板天梯、游资龙虎榜等实时数据",
+    instructions=(
+        "A 股日报快照 — 零配置获取赚钱效应、"
+        "热门题材、连板天梯、游资龙虎榜等实时数据"
+    ),
 )
 
 _client = HhxgClient()
@@ -36,8 +39,9 @@ _client = HhxgClient()
 
 @mcp.tool()
 def get_snapshot() -> str:
-    """获取完整的 A 股日报快照，包含市场赚钱效应、热门题材、行业资金、连板天梯、游资龙虎榜、焦点新闻。
+    """获取完整的 A 股日报快照。
 
+    包含市场赚钱效应、热门题材、行业资金、连板天梯、游资龙虎榜、焦点新闻。
     这是最全面的工具，适合需要市场全貌时调用。数据每个交易日盘后更新。
     """
     snap = _client.get_snapshot(force=True)

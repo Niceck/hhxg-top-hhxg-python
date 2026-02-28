@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from .models import (
     Hotmoney,
+    HotTheme,
     LadderDetail,
     Market,
-    HotTheme,
     NewsItem,
     SectorGroup,
     Snapshot,
@@ -42,7 +42,7 @@ def format_snapshot(snap: Snapshot) -> str:
     if snap.focus_news:
         parts.append(f"\n{format_news(snap.focus_news)}")
 
-    parts.append(f"\n---\n数据来源: [恢恢量化](https://hhxg.top)")
+    parts.append("\n---\n数据来源: [恢恢量化](https://hhxg.top)")
     return "\n".join(parts)
 
 
