@@ -1,52 +1,52 @@
-# hhxg — A 股日报快照
+# hhxg-market — A 股日报快照 Skill
 
-> 零配置获取 A 股每日市场数据 — 赚钱效应、热门题材、连板天梯、游资龙虎榜、焦点新闻
+> Claude Code 技能：零配置获取 A 股每日市场数据 — 赚钱效应、热门题材、连板天梯、游资龙虎榜、焦点新闻
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![CI](https://github.com/Niceck/hhxg-top-hhxg-python/actions/workflows/ci.yml/badge.svg)](https://github.com/Niceck/hhxg-top-hhxg-python/actions)
 [![Daily Update](https://github.com/Niceck/hhxg-top-hhxg-python/actions/workflows/daily-snapshot.yml/badge.svg)](https://github.com/Niceck/hhxg-top-hhxg-python/actions)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---
 
-## 三种使用方式
+## 什么是 hhxg-market？
 
-| 方式 | 适用场景 | 需要安装 |
-|------|----------|----------|
-| **Claude Code Skill** | Claude Code / 小龙虾 CLI | 无需安装 |
-| **Python SDK** | 量化研究、数据分析 | `pip install hhxg` |
-| **MCP Server** | Claude Desktop / Cursor | `pip install hhxg[mcp]` |
+一个 [Claude Code](https://claude.ai/code) 技能（Skill），安装后对 AI 说「今天 A 股怎么样」就能获取完整的盘后日报数据。
+
+**无需注册、无需 Token、无需安装 Python 包**，仅需 Python 3 标准库。
+
+数据由 [恢恢量化](https://hhxg.top) 每个交易日 **20:00** 更新，覆盖 5000+ 只 A 股。
 
 ---
 
-## 方式一：Claude Code Skill（推荐）
-
-**零安装，复制即用。**
-
-### 安装
+## 安装（一键复制）
 
 ```bash
-# 复制 skill 到 Claude Code skills 目录
-mkdir -p ~/.claude/skills/hhxg-market/scripts ~/.claude/skills/hhxg-market/references
+mkdir -p ~/.claude/skills/hhxg-market/{scripts,references} && \
 curl -sL https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/skill/SKILL.md \
-  -o ~/.claude/skills/hhxg-market/SKILL.md
+  -o ~/.claude/skills/hhxg-market/SKILL.md && \
 curl -sL https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/skill/scripts/fetch_snapshot.py \
-  -o ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py
+  -o ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py && \
 curl -sL https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/skill/references/data-schema.md \
-  -o ~/.claude/skills/hhxg-market/references/data-schema.md
+  -o ~/.claude/skills/hhxg-market/references/data-schema.md && \
 curl -sL https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/skill/references/scheduled-fetch.md \
-  -o ~/.claude/skills/hhxg-market/references/scheduled-fetch.md
-chmod +x ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py
+  -o ~/.claude/skills/hhxg-market/references/scheduled-fetch.md && \
+chmod +x ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py && \
+echo "✅ hhxg-market skill 安装完成，重启 Claude Code 即可使用"
 ```
 
-### 使用
+---
 
-安装后重启 Claude Code，直接对话即可：
+## 使用方式
+
+### 在 Claude Code 中对话
+
+安装后重启 Claude Code，直接对话：
 
 ```
 你：今天 A 股怎么样？
 你：热门题材有哪些？
 你：连板天梯
 你：龙虎榜游资动向
+你：行业资金流向
 你：/hhxg-market
 ```
 
@@ -66,9 +66,9 @@ chmod +x ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py
 | 新闻 | 焦点新闻、市场新闻、今日要闻 |
 | 速览 | 股市快报、股市速递、市场快照、每日快报 |
 
-### 独立使用脚本
+### 终端独立使用
 
-不依赖 Claude Code，直接在终端运行（仅需 Python 3，无第三方依赖）：
+不依赖 Claude Code，直接在终端运行：
 
 ```bash
 # 完整快照
@@ -83,9 +83,24 @@ python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py sectors  # 行业
 python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py news     # 焦点新闻
 ```
 
-### 定时获取（每日 20:00）
+---
 
-**macOS launchd：**
+## 数据内容
+
+| 板块 | 内容 |
+|------|------|
+| 市场赚钱效应 | 情绪指数、涨跌家数分布、涨停/炸板/跌停、结构差值、晋级率 |
+| 热门题材 | TOP 题材排行、涨停数、净流入、龙头股 |
+| 行业资金 | 强势/弱势板块、净流入排名、领涨股、偏离度 |
+| 连板天梯 | 各级连板股票、晋级率、地域分布、概念分布 |
+| 游资龙虎榜 | 净买入 TOP、知名游资席位（赵老哥、炒股养家等）操作明细 |
+| 焦点新闻 | 市场焦点 + 宏观新闻 |
+
+---
+
+## 定时获取（每日 20:00）
+
+### macOS launchd
 
 ```bash
 cat > ~/Library/LaunchAgents/com.hhxg.snapshot.plist << 'EOF'
@@ -115,7 +130,7 @@ EOF
 launchctl load ~/Library/LaunchAgents/com.hhxg.snapshot.plist
 ```
 
-**cron：**
+### cron
 
 ```bash
 (crontab -l 2>/dev/null; echo "0 20 * * 1-5 /usr/bin/python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py > /tmp/hhxg-snapshot.log 2>&1") | crontab -
@@ -123,89 +138,34 @@ launchctl load ~/Library/LaunchAgents/com.hhxg.snapshot.plist
 
 ---
 
-## 方式二：Python SDK
+## 卸载
 
 ```bash
-pip install hhxg
-```
-
-```python
-import hhxg
-
-snapshot = hhxg.get_snapshot()
-print(f"赚钱效应: {snapshot.market.sentiment_index}%")
-print(f"最高连板: {snapshot.ladder.top_streak.name} {snapshot.ladder.max_streak}板")
-```
-
-完整 API：
-
-| 函数 | 返回类型 | 说明 |
-|------|----------|------|
-| `get_snapshot()` | `Snapshot` | 完整日报快照 |
-| `get_market()` | `Market` | 市场赚钱效应、涨跌分布 |
-| `get_hot_themes()` | `list[HotTheme]` | 热门题材及龙头股 |
-| `get_sectors()` | `list[SectorGroup]` | 行业/板块资金流向 |
-| `get_ladder()` | `LadderDetail` | 连板天梯（含晋级率） |
-| `get_hotmoney()` | `Hotmoney` | 游资龙虎榜（含席位明细） |
-| `get_news()` | `list[NewsItem]` | 焦点新闻 |
-
-搭配 Pandas：
-
-```python
-import hhxg, pandas as pd
-
-themes = hhxg.get_hot_themes()
-df = pd.DataFrame([
-    {"题材": t.name, "涨停数": t.limitup_count, "净流入(亿)": t.net_yi}
-    for t in themes
-])
-print(df.to_string(index=False))
+rm -rf ~/.claude/skills/hhxg-market
 ```
 
 ---
 
-## 方式三：MCP Server
+## 文件结构
 
-```bash
-pip install hhxg[mcp]
 ```
-
-**Claude Desktop** — 编辑 `~/Library/Application Support/Claude/claude_desktop_config.json`：
-
-```json
-{ "mcpServers": { "hhxg": { "command": "hhxg-mcp" } } }
+skill/
+├── SKILL.md                    # Skill 定义文件
+├── scripts/
+│   └── fetch_snapshot.py       # 零依赖获取脚本（仅用 Python 3 标准库）
+├── references/
+│   ├── data-schema.md          # JSON 数据结构说明
+│   └── scheduled-fetch.md      # 定时任务配置指南
+└── data/                       # 每日自动更新（GitHub Actions）
+    ├── latest.json             # 最新快照原始数据
+    └── report.md               # 最新快照格式化报告
 ```
-
-**Cursor** — Settings > MCP 添加同上配置。
-
-**Claude Code：**
-
-```bash
-claude mcp add hhxg hhxg-mcp
-```
-
-配置完成后直接说「今天 A 股怎么样」即可。
-
----
-
-## 数据内容
-
-每日快照涵盖 5000+ 只 A 股，交易日盘后 **20:00** 更新：
-
-| 板块 | 内容 |
-|------|------|
-| 市场赚钱效应 | 情绪指数、涨跌家数分布、涨停/炸板/跌停、结构差值 |
-| 热门题材 | TOP 题材排行、涨停数、净流入、龙头股 |
-| 行业资金 | 强势/弱势板块、净流入排名、领涨股、偏离度 |
-| 连板天梯 | 各级连板股票、晋级率、地域分布、概念分布 |
-| 游资龙虎榜 | 净买入 TOP、知名游资席位操作明细 |
-| 焦点新闻 | 市场焦点 + 宏观新闻 |
 
 ---
 
 ## 数据来源
 
-数据由 [恢恢量化](https://hhxg.top) 每日盘后更新。
+数据由 [恢恢量化](https://hhxg.top) 每日盘后更新，覆盖 5000+ 只 A 股。
 
 > 数据仅供研究参考，不构成投资建议。
 
