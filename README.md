@@ -1,6 +1,6 @@
 # hhxg-market — A 股日报快照 Skill
 
-> Claude Code 技能：零配置获取 A 股每日市场数据 — 赚钱效应、热门题材、连板天梯、游资龙虎榜、焦点新闻
+> Claude Code / OpenClaw 技能：零配置获取 A 股每日市场数据 — 赚钱效应、热门题材、连板天梯、游资龙虎榜、焦点新闻
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -8,7 +8,7 @@
 
 ## 什么是 hhxg-market？
 
-一个 [Claude Code](https://claude.ai/code) 技能（Skill），安装后对 AI 说「今天 A 股怎么样」就能获取完整的盘后日报数据。
+一个 [Claude Code](https://claude.ai/code) / [OpenClaw](https://github.com/nicepkg/openclaw) 技能（Skill），安装后对 AI 说「今天 A 股怎么样」就能获取完整的盘后日报数据。
 
 **无需注册、无需 Token、无需安装 Python 包**，仅需 Python 3 标准库。
 
@@ -18,8 +18,14 @@
 
 ## 安装（一键复制）
 
+**Claude Code：**
 ```bash
 git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git ~/.claude/skills/hhxg-market
+```
+
+**OpenClaw：**
+```bash
+git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git ~/.openclaw/skills/hhxg-market
 ```
 
 ---
@@ -53,16 +59,19 @@ git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git ~/.claude
 不依赖 Claude Code，直接在终端运行：
 
 ```bash
+# 定位脚本（兼容 Claude Code / OpenClaw）
+SCRIPT=$(find ~/.claude/skills ~/.openclaw/skills -name fetch_snapshot.py -path '*/hhxg-market/*' 2>/dev/null | head -1)
+
 # 完整快照
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py
+python3 "$SCRIPT"
 
 # 只看特定板块
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py market   # 赚钱效应
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py themes   # 热门题材
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py ladder   # 连板天梯
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py hotmoney # 游资龙虎榜
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py sectors  # 行业资金
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py news     # 焦点新闻
+python3 "$SCRIPT" market   # 赚钱效应
+python3 "$SCRIPT" themes   # 热门题材
+python3 "$SCRIPT" ladder   # 连板天梯
+python3 "$SCRIPT" hotmoney # 游资龙虎榜
+python3 "$SCRIPT" sectors  # 行业资金
+python3 "$SCRIPT" news     # 焦点新闻
 ```
 
 ---
