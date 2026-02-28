@@ -45,6 +45,12 @@ dependencies = [
     "pydantic>=2.0.0",
 ]
 
+[project.optional-dependencies]
+mcp = ["mcp>=1.0.0"]
+
+[project.scripts]
+hhxg-mcp = "hhxg.mcp_server:main"
+
 [project.urls]
 Homepage = "https://hhxg.top"
 Repository = "https://github.com/hhxg-top/hhxg-python"

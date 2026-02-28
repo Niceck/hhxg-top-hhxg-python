@@ -128,6 +128,64 @@ snapshot = client.get_snapshot(force=True)  # 跳过内存缓存
 
 ---
 
+## MCP Server — AI 工具直接调用
+
+安装 MCP 依赖：
+
+```bash
+pip install hhxg[mcp]
+```
+
+### Claude Desktop
+
+编辑 `~/Library/Application Support/Claude/claude_desktop_config.json`：
+
+```json
+{
+  "mcpServers": {
+    "hhxg": {
+      "command": "hhxg-mcp"
+    }
+  }
+}
+```
+
+### Cursor
+
+在 Cursor Settings > MCP 中添加：
+
+```json
+{
+  "mcpServers": {
+    "hhxg": {
+      "command": "hhxg-mcp"
+    }
+  }
+}
+```
+
+### Claude Code
+
+```bash
+claude mcp add hhxg hhxg-mcp
+```
+
+### 可用 MCP 工具
+
+| 工具 | 说明 |
+|------|------|
+| `get_snapshot` | 完整日报快照（最全面） |
+| `get_market` | 市场赚钱效应、涨跌分布 |
+| `get_hot_themes` | 热门题材及龙头股 |
+| `get_sectors` | 行业/板块资金流向 |
+| `get_ladder` | 连板天梯 |
+| `get_hotmoney` | 游资龙虎榜 |
+| `get_news` | 焦点新闻 |
+
+配置完成后，直接对 AI 说「今天 A 股怎么样」「哪些题材最热」即可。
+
+---
+
 ## AI 生态联动
 
 hhxg 是[恢恢量化](https://hhxg.top) AI 生态的一部分：
@@ -135,7 +193,7 @@ hhxg 是[恢恢量化](https://hhxg.top) AI 生态的一部分：
 | 接入方式 | 适用场景 | 状态 |
 |----------|----------|------|
 | **Python SDK**（本项目） | 量化研究、数据分析 | ✅ 可用 |
-| **MCP Server** | Claude Desktop / Cursor | 🚧 开发中 |
+| **MCP Server**（本项目） | Claude Desktop / Cursor / Claude Code | ✅ 可用 |
 | **GPT Action** | ChatGPT 自定义 GPT | 🚧 开发中 |
 
 ---

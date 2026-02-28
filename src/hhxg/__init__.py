@@ -124,6 +124,8 @@ __all__ = [
     "HhxgError",
     "NetworkError",
     "SchemaError",
+    # formatters
+    "formatters",
     # version
     "__version__",
 ]
