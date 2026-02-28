@@ -20,61 +20,14 @@ from __future__ import annotations
 import json
 import os
 import sys
-import urllib.request
 
-URL = "https://hhxg.top/static/data/assistant/skill_snapshot.json"
-SUPPORTED_SCHEMA = 3
-CACHE_DIR = os.path.expanduser("~/.cache/hhxg-market")
-CACHE_FILE = os.path.join(CACHE_DIR, "last.json")
-
-
-def _save_cache(data):
-    try:
-        os.makedirs(CACHE_DIR, exist_ok=True)
-        with open(CACHE_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False)
-    except OSError:
-        pass
-
-
-def _load_cache():
-    try:
-        with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (OSError, json.JSONDecodeError):
-        return None
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _common import fetch_json, check_schema, print_cache_hint
 
 
 def fetch():
-    """获取数据，失败时用本地缓存兜底。"""
-    try:
-        req = urllib.request.Request(URL, headers={
-            "User-Agent": "hhxg-skill/1.0",
-            "X-Skill-Client": "clawhub",
-        })
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        _save_cache(data)
-        return data, False
-    except Exception:
-        cached = _load_cache()
-        if cached:
-            return cached, True
-        raise RuntimeError(
-            "数据服务暂时不可用，且无本地缓存。请稍后重试或直接访问 https://hhxg.top"
-        )
-
-
-def check_schema(data):
-    """schema 版本检查，不匹配时输出警告。"""
-    meta = data.get("meta", {})
-    ver = meta.get("schema_version", SUPPORTED_SCHEMA)
-    if ver > SUPPORTED_SCHEMA:
-        print(
-            "WARNING: 数据格式已更新 (v%s)，当前技能支持 v%s，建议升级：\n"
-            "  cd ~/.claude/skills/hhxg-market && git pull\n" % (ver, SUPPORTED_SCHEMA),
-            file=sys.stderr,
-        )
+    """获取日报快照数据。"""
+    return fetch_json("assistant/skill_snapshot.json", "last.json")
 
 
 # ── Formatters ──────────────────────────────────────────────
@@ -278,10 +231,95 @@ def fmt_ai_summary(data):
     return "\n".join(lines)
 
 
+def fmt_comparison(data):
+    """较昨日变化 + 趋势钩子"""
+    comp = data.get("comparison")
+    if not comp:
+        return ""
+    yd = comp.get("yesterday", {})
+    m = data.get("market", {})
+    lines = ["## 较昨日变化", ""]
+
+    today_lu = m.get("limit_up")
+    yd_lu = yd.get("limit_up")
+    if today_lu is not None and yd_lu is not None:
+        diff_lu = today_lu - yd_lu
+        sign_lu = "+" if diff_lu > 0 else ""
+        lines.append("涨停 %s（昨 %s，%s%s）" % (today_lu, yd_lu, sign_lu, diff_lu))
+
+    today_si = m.get("sentiment_index")
+    yd_si = yd.get("sentiment_index")
+    if today_si is not None and yd_si is not None:
+        diff_si = round(today_si - yd_si, 1)
+        sign_si = "+" if diff_si > 0 else ""
+        lines.append("情绪 %s%%（昨 %s%%，%s%s%%）" % (today_si, yd_si, sign_si, diff_si))
+
+    today_fr = m.get("fried")
+    yd_fr = yd.get("fried")
+    if today_fr is not None and yd_fr is not None:
+        diff_fr = today_fr - yd_fr
+        sign_fr = "+" if diff_fr > 0 else ""
+        lines.append("炸板 %s（昨 %s，%s%s）" % (today_fr, yd_fr, sign_fr, diff_fr))
+
+    trend_label = comp.get("trend_label", "")
+    if trend_label:
+        lines.append("")
+        lines.append("趋势判断: **%s**" % trend_label)
+
+    trend_url = comp.get("trend_url", "")
+    if trend_url:
+        lines.append("近10日趋势图 → %s" % trend_url)
+
+    return "\n".join(lines)
+
+
+def fmt_signals(data):
+    """量化工具钩子（选股信号 + 策略回溯 + 异动/ETF）"""
+    sig = data.get("signals_count")
+    if not sig:
+        return ""
+    lines = ["## 量化工具", ""]
+
+    # 钩子② 选股信号
+    counts = []
+    for key, label in [
+        ("jiuzhuan", "九转买入信号"),
+        ("multi_factor", "多因子评分>80"),
+        ("emotion_sync", "情绪共振信号"),
+    ]:
+        val = sig.get(key)
+        if val is not None:
+            counts.append("· %s: %s只" % (label, val))
+    if counts:
+        total = sum(
+            sig.get(k, 0) for k in ("jiuzhuan", "multi_factor", "emotion_sync")
+        )
+        lines.append("选股信号 %s个（%s免费查看名单）" % (total, sig.get("free_day", "每周一")))
+        lines.extend(counts)
+        xuangu_url = sig.get("xuangu_url", "https://hhxg.top/xuangu.html")
+        lines.append("→ %s" % xuangu_url)
+        lines.append("")
+
+    # 钩子③ 策略回溯
+    backtest_url = sig.get("backtest_url", "https://hhxg.top/xuangu.html#backtest")
+    lines.append("策略回溯（自定义信号组合 + 历史胜率）")
+    lines.append("→ %s" % backtest_url)
+    lines.append("")
+
+    # 钩子④ 异动预警
+    vol_count = sig.get("volatility_alert")
+    if vol_count is not None:
+        lines.append("异动预警 %s只 → https://hhxg.top/yidong.html" % vol_count)
+
+    lines.append("ETF工具 → https://hhxg.top/etf.html")
+
+    return "\n".join(lines)
+
+
 def fmt_snapshot(data):
-    """完整快照"""
+    """完整快照 — 标准输出模板"""
     parts = [
-        "# A 股日报快照 — %s" % data.get("date", ""),
+        "# 恢恢量化 · %s" % data.get("date", ""),
         "",
     ]
     summary = fmt_ai_summary(data)
@@ -290,6 +328,8 @@ def fmt_snapshot(data):
         parts.append("")
 
     sep = "\n\n---\n\n"
+
+    # ━━ 今日完整数据 ━━
     parts.append(fmt_market(data))
     parts.append(sep)
     parts.append(fmt_themes(data))
@@ -301,9 +341,21 @@ def fmt_snapshot(data):
     parts.append(fmt_sectors(data))
     parts.append(sep)
     parts.append(fmt_news(data))
+
+    # ━━ 较昨日变化 ━━
+    comp_text = fmt_comparison(data)
+    if comp_text:
+        parts.append(sep)
+        parts.append(comp_text)
+
+    # ━━ 量化工具（钩子）━━
+    sig_text = fmt_signals(data)
+    if sig_text:
+        parts.append(sep)
+        parts.append(sig_text)
+
     parts.append("")
     parts.append("---")
-    parts.append("")
     parts.append("数据来源: 恢恢量化 https://hhxg.top")
     return "\n".join(parts)
 
@@ -319,6 +371,8 @@ SECTIONS = {
     "hotmoney": fmt_hotmoney,
     "sectors": fmt_sectors,
     "news": fmt_news,
+    "comparison": fmt_comparison,
+    "signals": fmt_signals,
 }
 
 
@@ -340,12 +394,7 @@ def main():
         sys.exit(1)
 
     check_schema(data)
-
-    if from_cache:
-        print(
-            "NOTE: 网络不可用，以下为本地缓存数据（%s）\n" % data.get("date", "未知日期"),
-            file=sys.stderr,
-        )
+    print_cache_hint(from_cache, data.get("date", ""))
 
     if use_json:
         print(json.dumps(data, ensure_ascii=False, indent=2))
