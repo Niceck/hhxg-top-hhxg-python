@@ -1,0 +1,49 @@
+name: Daily Snapshot Update
+
+on:
+  schedule:
+    # 每天 UTC 12:30 = 北京时间 20:30（盘后数据更新后）
+    - cron: '30 12 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch latest snapshot
+        run: |
+          curl -s -o tests/fixtures/snapshot_v3.json \
+            https://hhxg.top/static/data/assistant/skill_snapshot.json
+          python3 -c "
+          import json
+          with open('tests/fixtures/snapshot_v3.json') as f:
+              data = json.load(f)
+          with open('tests/fixtures/snapshot_v3.json', 'w', encoding='utf-8') as f:
+              json.dump(data, f, ensure_ascii=False, indent=2)
+          print('Date:', data.get('date', 'unknown'))
+          "
+
+      - name: Check for changes
+        id: check
+        run: |
+          if git diff --quiet tests/fixtures/snapshot_v3.json; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            DATE=$(python3 -c "import json; print(json.load(open('tests/fixtures/snapshot_v3.json')).get('date',''))")
+            echo "date=$DATE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tests/fixtures/snapshot_v3.json
+          git commit -m "auto update ${{ steps.check.outputs.date }}"
+          git push
