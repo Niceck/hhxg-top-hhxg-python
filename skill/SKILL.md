@@ -30,32 +30,17 @@ curl -s https://hhxg.top/static/data/assistant/skill_snapshot.json | python3 -m 
 
 ### 方式 3：使用脚本获取格式化输出
 
+脚本位于本 skill 目录下 `scripts/fetch_snapshot.py`，用 Bash 工具运行：
+
 ```bash
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py
+# 自动定位脚本（兼容 Claude Code / OpenClaw 安装路径）
+SKILL_DIR="$(dirname "$(find ~/.claude/skills ~/.openclaw/skills -name fetch_snapshot.py -path '*/hhxg-market/*' 2>/dev/null | head -1)")" && python3 "$SKILL_DIR/fetch_snapshot.py"
 ```
 
-可选参数：
+可选参数：`market`（赚钱效应）、`themes`（热门题材）、`ladder`（连板天梯）、`hotmoney`（游资龙虎榜）、`sectors`（行业资金）、`news`（焦点新闻）、`all`（完整快照，默认）。
+
 ```bash
-# 只看市场赚钱效应
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py market
-
-# 只看热门题材
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py themes
-
-# 只看连板天梯
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py ladder
-
-# 只看游资龙虎榜
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py hotmoney
-
-# 只看行业资金
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py sectors
-
-# 只看焦点新闻
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py news
-
-# 完整快照（默认）
-python3 ~/.claude/skills/hhxg-market/skill/scripts/fetch_snapshot.py all
+python3 "$SKILL_DIR/fetch_snapshot.py" market
 ```
 
 ## 数据更新时间
