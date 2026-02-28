@@ -2,13 +2,15 @@
 """A 股日报快照获取脚本 — 零依赖，仅需 Python 3 标准库。
 
 Usage:
-    python3 fetch_snapshot.py          # 完整快照
-    python3 fetch_snapshot.py market   # 市场赚钱效应
-    python3 fetch_snapshot.py themes   # 热门题材
-    python3 fetch_snapshot.py ladder   # 连板天梯
-    python3 fetch_snapshot.py hotmoney # 游资龙虎榜
-    python3 fetch_snapshot.py sectors  # 行业资金
-    python3 fetch_snapshot.py news     # 焦点新闻
+    python3 fetch_snapshot.py              # 完整快照
+    python3 fetch_snapshot.py summary      # AI 一句话总结
+    python3 fetch_snapshot.py market       # 市场赚钱效应
+    python3 fetch_snapshot.py themes       # 热门题材
+    python3 fetch_snapshot.py ladder       # 连板天梯
+    python3 fetch_snapshot.py hotmoney     # 游资龙虎榜
+    python3 fetch_snapshot.py sectors      # 行业资金
+    python3 fetch_snapshot.py news         # 焦点新闻
+    python3 fetch_snapshot.py themes --json # JSON 原始输出
 
 数据来源: https://hhxg.top
 """
@@ -16,16 +18,63 @@ Usage:
 from __future__ import annotations
 
 import json
+import os
 import sys
 import urllib.request
 
 URL = "https://hhxg.top/static/data/assistant/skill_snapshot.json"
+SUPPORTED_SCHEMA = 3
+CACHE_DIR = os.path.expanduser("~/.cache/hhxg-market")
+CACHE_FILE = os.path.join(CACHE_DIR, "last.json")
+
+
+def _save_cache(data):
+    try:
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        with open(CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False)
+    except OSError:
+        pass
+
+
+def _load_cache():
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
 
 
 def fetch():
-    req = urllib.request.Request(URL, headers={"User-Agent": "hhxg-skill/1.0"})
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    """获取数据，失败时用本地缓存兜底。"""
+    try:
+        req = urllib.request.Request(URL, headers={
+            "User-Agent": "hhxg-skill/1.0",
+            "X-Skill-Client": "clawhub",
+        })
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        _save_cache(data)
+        return data, False
+    except Exception:
+        cached = _load_cache()
+        if cached:
+            return cached, True
+        raise RuntimeError(
+            "数据服务暂时不可用，且无本地缓存。请稍后重试或直接访问 https://hhxg.top"
+        )
+
+
+def check_schema(data):
+    """schema 版本检查，不匹配时输出警告。"""
+    meta = data.get("meta", {})
+    ver = meta.get("schema_version", SUPPORTED_SCHEMA)
+    if ver > SUPPORTED_SCHEMA:
+        print(
+            "WARNING: 数据格式已更新 (v%s)，当前技能支持 v%s，建议升级：\n"
+            "  cd ~/.claude/skills/hhxg-market && git pull\n" % (ver, SUPPORTED_SCHEMA),
+            file=sys.stderr,
+        )
 
 
 # ── Formatters ──────────────────────────────────────────────
@@ -274,19 +323,34 @@ SECTIONS = {
 
 
 def main():
-    section = sys.argv[1] if len(sys.argv) > 1 else "all"
+    args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    flags = {a for a in sys.argv[1:] if a.startswith("-")}
+    use_json = "--json" in flags
+
+    section = args[0] if args else "all"
     if section not in SECTIONS:
         print("未知板块: %s" % section)
         print("可选: %s" % ", ".join(SECTIONS))
         sys.exit(1)
 
     try:
-        data = fetch()
-    except Exception as e:
-        print("获取数据失败: %s" % e)
+        data, from_cache = fetch()
+    except RuntimeError as e:
+        print(str(e), file=sys.stderr)
         sys.exit(1)
 
-    print(SECTIONS[section](data))
+    check_schema(data)
+
+    if from_cache:
+        print(
+            "NOTE: 网络不可用，以下为本地缓存数据（%s）\n" % data.get("date", "未知日期"),
+            file=sys.stderr,
+        )
+
+    if use_json:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+    else:
+        print(SECTIONS[section](data))
 
 
 if __name__ == "__main__":
