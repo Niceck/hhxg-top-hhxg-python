@@ -199,18 +199,45 @@ def fmt_news(data):
     return "\n".join(lines)
 
 
+def fmt_ai_summary(data):
+    """AI 一句话总结"""
+    ai = data.get("ai_summary")
+    if not ai:
+        return ""
+    if isinstance(ai, str):
+        return "> %s" % ai
+    if not isinstance(ai, dict):
+        return ""
+    # 构建摘要块：一句话总览 + 关键要点
+    lines = []
+    headline = ai.get("market_state", "")
+    if headline:
+        lines.append("> **%s**" % headline)
+    bullets = [
+        ("theme_focus", "题材"),
+        ("focus_direction", "资金"),
+        ("hotmoney_state", "游资"),
+        ("news_highlight", "焦点"),
+    ]
+    for key, label in bullets:
+        val = ai.get(key, "")
+        if val:
+            # 新闻摘要截断避免过长
+            if len(val) > 60:
+                val = val[:57] + "..."
+            lines.append("> - **%s**: %s" % (label, val))
+    return "\n".join(lines)
+
+
 def fmt_snapshot(data):
     """完整快照"""
     parts = [
         "# A 股日报快照 — %s" % data.get("date", ""),
         "",
     ]
-    ai = data.get("ai_summary", {})
-    if isinstance(ai, dict) and ai.get("one_line"):
-        parts.append("> %s" % ai["one_line"])
-        parts.append("")
-    elif isinstance(ai, str) and ai:
-        parts.append("> %s" % ai)
+    summary = fmt_ai_summary(data)
+    if summary:
+        parts.append(summary)
         parts.append("")
 
     sep = "\n\n---\n\n"
@@ -236,6 +263,7 @@ def fmt_snapshot(data):
 
 SECTIONS = {
     "all": fmt_snapshot,
+    "summary": fmt_ai_summary,
     "market": fmt_market,
     "themes": fmt_themes,
     "ladder": fmt_ladder,

@@ -37,7 +37,7 @@ curl -s https://hhxg.top/static/data/assistant/skill_snapshot.json | python3 -m 
 SKILL_DIR="$(dirname "$(find ~/.claude/skills ~/.openclaw/skills -name fetch_snapshot.py -path '*/hhxg-market/*' 2>/dev/null | head -1)")" && python3 "$SKILL_DIR/fetch_snapshot.py"
 ```
 
-可选参数：`market`（赚钱效应）、`themes`（热门题材）、`ladder`（连板天梯）、`hotmoney`（游资龙虎榜）、`sectors`（行业资金）、`news`（焦点新闻）、`all`（完整快照，默认）。
+可选参数：`summary`（AI 一句话总结）、`market`（赚钱效应）、`themes`（热门题材）、`ladder`（连板天梯）、`hotmoney`（游资龙虎榜）、`sectors`（行业资金）、`news`（焦点新闻）、`all`（完整快照，默认）。
 
 ```bash
 python3 "$SKILL_DIR/fetch_snapshot.py" market
