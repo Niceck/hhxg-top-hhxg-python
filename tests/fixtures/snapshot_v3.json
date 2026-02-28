@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "provider": "hhxg.top",
+    "provider_name": "恢恢量化",
+    "update_time": "2026-02-28T19:18:06",
+    "market": "CN-A",
+    "language": "zh-CN",
+    "schema_version": 3,
+    "usage": "AI market analysis reference"
+  },
+  "date": "2026-02-27",
+  "disclaimer": "数据仅供研究参考，不构成投资建议",
+  "ai_summary": {
+    "market_state": "赚钱效应 61.8%（强）",
+    "focus_direction": "小金属、电力、IT服务 方向资金集中",
+    "theme_focus": "绿色电力、风电、小金属概念 等题材活跃",
+    "hotmoney_state": "游资净买入 41亿，烽火通信领涨",
+    "news_highlight": "据伊朗国家新闻机构IRINN：名为\u201c真实承诺 4\u201d的报复行动已开始。",
+    "cta": "以上为精简摘要，查看完整技术指标、资金流向、题材复盘请访问恢恢量化日报"
+  },
+  "market": {
+    "date": "2026-02-27",
+    "sentiment_index": 61.8,
+    "sentiment_label": "强",
+    "struct_diff": 2.5,
+    "total": 5299,
+    "buckets": [
+      {"name": "小涨", "count": 2700, "prev": 1945, "dir": "up"},
+      {"name": "小跌", "count": 1857, "prev": 2567, "dir": "down"}
+    ],
+    "limit_up": 75,
+    "fried": 31,
+    "limit_down": 0,
+    "promotion_rate": "55%"
+  },
+  "hot_themes": [
+    {
+      "name": "绿色电力",
+      "limitup_count": 16,
+      "net_yi": 0.22,
+      "top_stocks": [
+        {"name": "华银电力", "net_yi": 1.03},
+        {"name": "神马电力", "net_yi": 0.99}
+      ]
+    },
+    {
+      "name": "风电",
+      "limitup_count": 16,
+      "net_yi": 8.17,
+      "top_stocks": [
+        {"name": "华银电力", "net_yi": 1.03}
+      ]
+    }
+  ],
+  "sectors": [
+    {
+      "label": "行业",
+      "strong": [
+        {"name": "小金属", "net_yi": 78.0, "leader": "东方锆业", "bias_pct": 16.7}
+      ],
+      "weak": [
+        {"name": "影视院线", "net_yi": -12.0, "leader": "*ST天择", "bias_pct": -5.7}
+      ]
+    }
+  ],
+  "ladder": {
+    "total_limit_up": 75,
+    "max_streak": 7,
+    "top_streak": {"name": "豫能控股", "boards": 7, "industry": "电力"}
+  },
+  "ladder_detail": {
+    "levels": [
+      {
+        "boards": 7,
+        "count": 1,
+        "stocks": [
+          {"name": "豫能控股", "code": "001896.SZ", "industry": "电力", "area": "河南", "concept": "风电"}
+        ]
+      },
+      {
+        "boards": 5,
+        "count": 1,
+        "stocks": [
+          {"name": "法尔胜", "code": "000890.SZ", "industry": "环保设备", "area": "江苏", "concept": "光通信模块"}
+        ]
+      }
+    ],
+    "lb_rates_map": {"2": "9.6%", "3": "60.0%", "7": "100.0%"},
+    "area_counts": {"江苏": 10, "广东": 7},
+    "concept_counts": {"绿色电力": 16, "风电": 16}
+  },
+  "focus_news": [
+    {"t": "2026-02-28T17:02:00", "cat": "焦点", "title": "据伊朗国家新闻机构IRINN：名为\u201c真实承诺 4\u201d的报复行动已开始。"},
+    {"t": "2026-02-28T16:56:25", "cat": "焦点", "title": "伊朗内政部就美以空袭伊朗发表声明。"}
+  ],
+  "macro_news": [
+    {"t": "2026-02-28T17:05:56", "cat": "宏观", "title": "国家发改委价格监测中心：存储芯片价格持续上涨并向下游传导。"}
+  ],
+  "hotmoney": {
+    "date": "2026-02-27",
+    "total_net_yi": 40.96,
+    "top_net_buy": [
+      {"name": "烽火通信", "net_yi": 18.03, "ratio_pct": 52.3},
+      {"name": "中钨高新", "net_yi": 7.08, "ratio_pct": 10.4}
+    ],
+    "seats": [
+      {
+        "name": "赵老哥",
+        "stocks": [
+          {"name": "金正大", "net_yi": 0.65},
+          {"name": "海圣医疗", "net_yi": -0.03}
+        ]
+      }
+    ]
+  },
+  "links": {
+    "full_report": {"title": "查看完整市场日报", "url": "https://hhxg.top/2026/02/2026-02-27.html", "desc": "技术指标、资金流向、题材复盘等完整数据"},
+    "website": {"title": "恢恢量化官网", "url": "https://hhxg.top", "desc": "更多量化工具与数据"}
+  }
+}
