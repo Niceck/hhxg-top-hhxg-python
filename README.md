@@ -2,7 +2,6 @@
 
 > Claude Code 技能：零配置获取 A 股每日市场数据 — 赚钱效应、热门题材、连板天梯、游资龙虎榜、焦点新闻
 
-[![Daily Update](https://github.com/Niceck/hhxg-top-hhxg-python/actions/workflows/daily-snapshot.yml/badge.svg)](https://github.com/Niceck/hhxg-top-hhxg-python/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---
@@ -98,46 +97,6 @@ python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py news     # 焦点
 
 ---
 
-## 定时获取（每日 20:00）
-
-### macOS launchd
-
-```bash
-cat > ~/Library/LaunchAgents/com.hhxg.snapshot.plist << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>com.hhxg.snapshot</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/usr/bin/python3</string>
-        <string>~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py</string>
-    </array>
-    <key>StartCalendarInterval</key>
-    <dict>
-        <key>Hour</key>
-        <integer>20</integer>
-        <key>Minute</key>
-        <integer>0</integer>
-    </dict>
-    <key>StandardOutPath</key>
-    <string>/tmp/hhxg-snapshot.log</string>
-</dict>
-</plist>
-EOF
-launchctl load ~/Library/LaunchAgents/com.hhxg.snapshot.plist
-```
-
-### cron
-
-```bash
-(crontab -l 2>/dev/null; echo "0 20 * * 1-5 /usr/bin/python3 ~/.claude/skills/hhxg-market/scripts/fetch_snapshot.py > /tmp/hhxg-snapshot.log 2>&1") | crontab -
-```
-
----
-
 ## 卸载
 
 ```bash
@@ -156,9 +115,9 @@ skill/
 ├── references/
 │   ├── data-schema.md          # JSON 数据结构说明
 │   └── scheduled-fetch.md      # 定时任务配置指南
-└── data/                       # 每日自动更新（GitHub Actions）
-    ├── latest.json             # 最新快照原始数据
-    └── report.md               # 最新快照格式化报告
+└── references/
+    ├── data-schema.md          # JSON 数据结构说明
+    └── scheduled-fetch.md      # 定时任务配置指南（可选）
 ```
 
 ---
