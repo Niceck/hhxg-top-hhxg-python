@@ -252,11 +252,11 @@ def fmt_sectors(data):
 
 
 def fmt_news(data):
-    focus = data.get("focus_news", [])
-    if not focus:
+    macro = data.get("macro_news", [])
+    if not macro:
         return "暂无新闻数据"
-    lines = ["# 焦点新闻 — %s" % data.get("date", ""), ""]
-    for n in focus[:6]:
+    lines = ["# 宏观新闻 — %s" % data.get("date", ""), ""]
+    for n in macro[:6]:
         t = n.get("t", "")
         if "T" in t:
             t = t.split("T")[1][:5]
