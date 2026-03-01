@@ -1,0 +1,300 @@
+openapi: "3.1.0"
+
+info:
+  title: 恢恢量化 A股数据接口
+  description: |
+    恢恢量化 A股量化数据 API，提供日报快照、融资融券、财经快讯、A股日历等数据。
+
+    **数据更新时间**：每个交易日盘后约 20:00（北京时间）
+
+    **使用说明**：
+    - 非交易日返回最近一个交易日的数据
+    - 所有接口均为公开接口，无需鉴权
+    - 详细数据及可视化图表请访问 [https://hhxg.top](https://hhxg.top)
+  version: "1.1.0"
+  contact:
+    name: 恢恢量化
+    url: https://hhxg.top
+
+servers:
+  - url: https://hhxg.top
+    description: 生产环境
+
+paths:
+  /api/snapshot:
+    get:
+      operationId: getSnapshot
+      summary: 获取 A 股日报快照
+      description: |
+        返回最近交易日的 A 股量化全景数据，包含：
+        - **市场情绪**（赚钱效应指数、涨停/炸板数量、昨日对比）
+        - **连板天梯**（各板数量、晋级率、失败率及个股明细）
+        - **游资龙虎榜**（买入/卖出榜单、席位净买明细）
+        - **热门题材**（资金净流入、涨停数量、领涨个股）
+        - **行业资金流向**（净流入额、涨跌幅、龙头股）
+        - **宏观新闻**（最近 6 条重要财经新闻）
+
+        数据每个交易日盘后约 20:00 更新。
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SnapshotResponse"
+        "502":
+          description: 数据源暂时不可用
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: 服务异常
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-openai-isConsequential: false
+
+  /api/margin:
+    get:
+      operationId: getMargin
+      summary: 获取近 7 日融资融券数据
+      description: |
+        返回近 7 个交易日的融资融券余额趋势，包含：
+        - 融资余额（亿元）及日变化量
+        - 融券余额（亿元）及日变化量
+        - 两融合计余额及趋势
+
+        数据每个交易日盘后约 20:00 更新。
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarginResponse"
+        "502":
+          description: 数据源暂时不可用
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-openai-isConsequential: false
+
+  /api/news:
+    get:
+      operationId: getNews
+      summary: 获取最新财经快讯
+      description: |
+        返回最新财经快讯列表，每小时滚动更新。
+        包含宏观政策、上市公司公告、市场动态等。
+      parameters:
+        - name: limit
+          in: query
+          description: 返回条数，范围 1-50，默认 20
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsResponse"
+        "502":
+          description: 数据源暂时不可用
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-openai-isConsequential: false
+
+  /api/calendar:
+    get:
+      operationId: getCalendar
+      summary: 获取 A 股日历
+      description: |
+        返回 A 股日历数据，支持以下类型：
+        - **trading** — 全年交易日历（开市/休市日期）
+        - **delivery** — 期权/期货交割日（全年）
+        - **earnings** — 财报季披露日期（按月）
+        - **unlock** — 限售股解禁日期（按月）
+      parameters:
+        - name: type
+          in: query
+          description: "数据类型：trading / delivery / earnings / unlock"
+          required: true
+          schema:
+            type: string
+            enum:
+              - trading
+              - delivery
+              - earnings
+              - unlock
+        - name: month
+          in: query
+          description: "月份，格式 YYYY-MM（earnings/unlock 时需要），默认当月"
+          required: false
+          schema:
+            type: string
+            pattern: "^\\d{4}-\\d{2}$"
+            example: "2026-03"
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalendarResponse"
+        "400":
+          description: 参数错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: 该月份数据暂未生成
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: 数据源暂时不可用
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      x-openai-isConsequential: false
+
+components:
+  schemas:
+    SnapshotResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          description: 日报快照数据
+          properties:
+            date:
+              type: string
+              description: 数据日期，格式 YYYY-MM-DD
+              example: "2026-03-01"
+            market:
+              type: object
+              description: 市场情绪数据（赚钱效应指数、涨停炸板数量）
+            hot_themes:
+              type: array
+              description: 热门题材列表（游资净流入、涨停数量）
+            sectors:
+              type: array
+              description: 行业资金流向列表（净流入、涨跌幅、龙头股）
+            ladder:
+              type: object
+              description: 连板天梯摘要（各板数量）
+            ladder_detail:
+              type: object
+              description: 连板天梯明细（晋级率、个股名称、行业）
+            hotmoney:
+              type: array
+              description: 游资龙虎榜（席位名称、净买额、个股明细）
+            macro_news:
+              type: array
+              description: 宏观财经新闻列表（最近 6 条）
+            comparison:
+              type: object
+              description: 昨日数据对比（市场情绪、涨停等）
+            ai_summary:
+              type: string
+              description: AI 生成的市场简评
+
+    MarginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          description: 近 7 日融资融券数据
+          properties:
+            days:
+              type: array
+              description: 按日期排列的融资融券记录
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    description: 日期
+                  margin_long:
+                    type: number
+                    description: 融资余额（亿元）
+                  margin_short:
+                    type: number
+                    description: 融券余额（亿元）
+                  total:
+                    type: number
+                    description: 两融合计（亿元）
+
+    NewsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              description: 财经快讯列表
+              items:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: 新闻标题
+                  time:
+                    type: string
+                    description: 发布时间
+                  category:
+                    type: string
+                    description: 新闻分类
+            total:
+              type: integer
+              description: 总条数
+
+    CalendarResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        type:
+          type: string
+          description: 数据类型
+        month:
+          type: string
+          description: 月份（earnings/unlock 有效）
+        data:
+          type: object
+          description: 日历数据（结构因 type 而异）
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: 错误信息
+          example: "数据源暂时不可用，请稍后重试"

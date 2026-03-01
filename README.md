@@ -113,12 +113,51 @@ python3 "$SKILL_DIR/margin.py" --json
 
 ---
 
+## GPT Actions / Dify / Coze 集成
+
+通过公开 REST API 接入任意 AI 平台，无需安装 Python：
+
+**API 基础地址**：`https://hhxg.top`
+
+| 端点 | 说明 |
+|------|------|
+| `GET /api/snapshot` | A 股日报快照（市场情绪、连板、龙虎榜等） |
+| `GET /api/margin` | 近 7 日融资融券余额 |
+| `GET /api/news?limit=20` | 最新财经快讯（最多 50 条） |
+| `GET /api/calendar?type=trading` | A 股日历（交易日/解禁/财报/交割日） |
+
+### GPT Actions 配置
+
+1. 创建 Custom GPT → Actions → **Import from URL**
+2. 填入 OpenAPI Schema URL：
+   ```
+   https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/openapi.yaml
+   ```
+3. 保存，在 GPT System Prompt 中加入：
+   ```
+   你是 A 股量化数据助手。用户询问 A 股行情、连板、龙虎榜、融资融券、
+   财经新闻时，调用 getSnapshot/getMargin/getNews/getCalendar 获取数据，
+   数据每个交易日盘后 20:00 更新。
+   ```
+
+### Dify / Coze 配置
+
+1. 新建「自定义工具」→ 选择 **OpenAPI Schema** 导入方式
+2. 粘贴 [openapi.yaml](openapi.yaml) 内容，或填入 Raw URL：
+   ```
+   https://raw.githubusercontent.com/Niceck/hhxg-top-hhxg-python/main/openapi.yaml
+   ```
+3. 工具授权选「无需鉴权」，保存并添加到 Agent 工作流
+
+---
+
 ## 文件结构
 
 ```
 ├── README.md
 ├── LICENSE
 ├── SKILL.md                  # Skill 定义文件（Claude Code / OpenClaw 读取）
+├── openapi.yaml              # OpenAPI 3.1 规范（GPT Actions / Dify / Coze 使用）
 ├── scripts/
 │   ├── _common.py            # 共用工具（HTTP、本地缓存、schema 检查）
 │   ├── fetch_snapshot.py     # 日报快照
