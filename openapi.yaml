@@ -127,8 +127,8 @@ paths:
       parameters:
         - name: type
           in: query
-          description: "数据类型：trading / delivery / earnings / unlock"
-          required: true
+          description: "数据类型：trading / delivery / earnings / unlock，默认 trading"
+          required: false
           schema:
             type: string
             enum:
@@ -136,6 +136,7 @@ paths:
               - delivery
               - earnings
               - unlock
+            default: trading
         - name: month
           in: query
           description: "月份，格式 YYYY-MM（earnings/unlock 时需要），默认当月"
