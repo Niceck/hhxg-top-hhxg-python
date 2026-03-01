@@ -127,6 +127,10 @@ def fmt_week(trading_days, all_events):
     else:
         lines.append("本周无重大日历事件")
 
+    lines.append("")
+    lines.append("---")
+    lines.append("📅 完整年度日历 / 解禁预告 / 业绩预期 → https://hhxg.top")
+
     return "\n".join(lines)
 
 

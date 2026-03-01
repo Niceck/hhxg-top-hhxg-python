@@ -88,6 +88,7 @@ SECTIONS = {"all": "all", "presets": "presets", "seats": "seats"}
 def main():
     section, _, use_json = run_main(SECTIONS)
 
+    data_audit = data_seats = None
     try:
         if section in ("all", "presets"):
             data_audit, cached1 = _fetch_audit()

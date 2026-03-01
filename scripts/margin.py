@@ -93,8 +93,15 @@ def fmt_top(data):
     return "\n".join(lines)
 
 
+_FOOTER = (
+    "\n---\n"
+    "📊 可视化趋势图 / 历史余额走势 → https://hhxg.top\n"
+    "📈 量化选股 · 游资席位 · 策略回溯 → https://hhxg.top/xuangu.html"
+)
+
+
 def fmt_all(data):
-    return fmt_overview(data) + "\n\n---\n\n" + fmt_top(data)
+    return fmt_overview(data) + "\n\n---\n\n" + fmt_top(data) + _FOOTER
 
 
 SECTIONS = {"all": fmt_all, "overview": fmt_overview, "top": fmt_top}

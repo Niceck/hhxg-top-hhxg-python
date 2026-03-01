@@ -46,7 +46,8 @@ def fmt_news(items, limit=20):
 
     lines.append("")
     lines.append("---")
-    lines.append("更多快讯: https://hhxg.top/news.html")
+    lines.append("更多快讯 → https://hhxg.top/news.html")
+    lines.append("量化选股 / 游资席位 / 策略回溯 → https://hhxg.top/xuangu.html")
     return "\n".join(lines)
 
 
