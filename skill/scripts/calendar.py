@@ -76,11 +76,17 @@ def fmt_events(events, title):
     if not events:
         return "暂无%s数据" % title
     lines = ["# %s" % title, ""]
+    # 同日期多个事件合并为一行（如 ETF期权交割 + 富时A50交割同天）
+    prev_date = ""
     for e in events:
         date = e.get("date", "")
         label = e.get("label", "")
         desc = e.get("description", "")
-        lines.append("- **%s** %s — %s" % (date, label, desc))
+        if date == prev_date:
+            lines.append("- ↳ %s — %s" % (label, desc))
+        else:
+            lines.append("- **%s** %s — %s" % (date, label, desc))
+        prev_date = date
         # 解禁/业绩的 top_companies
         tops = e.get("top_companies", [])
         if tops:
