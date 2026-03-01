@@ -1,6 +1,6 @@
 # hhxg-market — A 股量化数据助手
 
-> Claude Code / OpenClaw 技能：零配置获取 A 股日报、日历、融资融券、量化选股、实时快讯
+> Claude Code / OpenClaw 技能：零配置获取 A 股日报、日历、融资融券、实时快讯
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Data by hhxg.top](https://img.shields.io/badge/data-hhxg.top-blue.svg)](https://hhxg.top)
@@ -66,7 +66,6 @@ rm -rf ~/.claude/skills/hhxg-market
 | 日报快照 | `fetch_snapshot.py` | 赚钱效应、热门题材、连板天梯、游资龙虎榜、行业资金、焦点新闻 |
 | A 股日历 | `calendar.py` | 交易日查询、限售解禁、业绩预告、期货交割日 |
 | 融资融券 | `margin.py` | 近 7 日余额变化、融资净买入/净卖出 TOP |
-| 量化选股 | `strategy.py` | 13 策略审计（胜率/覆盖率）、游资席位持仓 |
 | 实时快讯 | `news.py` | 财经快讯流（按时间倒序） |
 
 ---
@@ -80,7 +79,6 @@ rm -rf ~/.claude/skills/hhxg-market
 你：热门题材 / 连板天梯 / 龙虎榜
 你：明天是交易日吗？
 你：融资融券数据
-你：量化选股策略
 你：最新财经快讯
 ```
 
@@ -92,7 +90,6 @@ rm -rf ~/.claude/skills/hhxg-market
 | 题材 | 热门题材、连板天梯、连板情况、龙虎榜、涨停、行业资金流向 |
 | 日历 | 今天是交易日吗、明天开盘吗、下周解禁、交割日、财报季 |
 | 两融 | 融资融券、两融、两融数据、融资净买入、融资余额 |
-| 选股 | 量化选股、选股策略、游资席位、买入信号、九转信号 |
 | 快讯 | 最新快讯、财经新闻、焦点新闻、实时新闻 |
 
 ### 终端独立使用
@@ -108,7 +105,6 @@ python3 "$SKILL_DIR/fetch_snapshot.py" market    # 赚钱效应
 python3 "$SKILL_DIR/fetch_snapshot.py" themes    # 热门题材
 python3 "$SKILL_DIR/calendar.py"                 # 本周日历
 python3 "$SKILL_DIR/margin.py"                   # 融资融券
-python3 "$SKILL_DIR/strategy.py"                 # 量化策略
 python3 "$SKILL_DIR/news.py" 30                  # 最新30条快讯
 
 # 所有脚本支持 --json 输出原始数据
@@ -128,7 +124,6 @@ python3 "$SKILL_DIR/margin.py" --json
 │   ├── fetch_snapshot.py     # 日报快照
 │   ├── calendar.py           # A 股日历
 │   ├── margin.py             # 融资融券
-│   ├── strategy.py           # 量化选股
 │   └── news.py               # 实时快讯
 └── references/
     └── data-schema.md        # JSON 字段结构说明

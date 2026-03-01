@@ -199,38 +199,7 @@ TopItem: `{name, latest_rzye_yi, delta_rzye_yi, delta_pct}`
 
 ---
 
-## 四、量化选股（strategy.py）
-
-### 策略审计
-
-URL: `xuangu/preset_audit.json`
-
-| 字段 | 说明 |
-|------|------|
-| `asof_used` | 数据截止日期 |
-| `universe_size` | 选股宇宙大小 |
-| `summary` | `{preset_total, coverage_pass, coverage_fail}` |
-| `presets` | 策略列表 `[PresetItem]` |
-
-PresetItem:
-
-| 字段 | 说明 |
-|------|------|
-| `key` | 策略标识 |
-| `label` | 策略中文名 |
-| `asof_hits` | 今日命中数 |
-| `coverage_check` | `"pass"` / `"fail"` |
-| `backtest_ma_exit` | 回测详情（仅网站展示） |
-
-### 游资席位
-
-URL: `xuangu/hotmoney_seats.json`
-
-类型: `{席位名: [股票代码, ...], ...}` — 字典，key 为席位名称，value 为代码数组。
-
----
-
-## 五、实时快讯（news.py）
+## 四、实时快讯（news.py）
 
 URL: `news/n0.json`
 
