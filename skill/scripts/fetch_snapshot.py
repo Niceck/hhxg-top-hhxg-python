@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _common import fetch_json, check_schema, print_cache_hint
@@ -294,7 +295,9 @@ def fmt_signals(data):
         total = sum(
             sig.get(k, 0) for k in ("jiuzhuan", "multi_factor", "emotion_sync")
         )
-        lines.append("选股信号 %s个（%s免费查看名单）" % (total, sig.get("free_day", "每周一")))
+        is_free_today = datetime.now().weekday() == 0  # 周一
+        free_hint = "今天免费查看名单" if is_free_today else "%s免费查看名单" % sig.get("free_day", "每周一")
+        lines.append("选股信号 %s个（%s）" % (total, free_hint))
         lines.extend(counts)
         xuangu_url = sig.get("xuangu_url", "https://hhxg.top/xuangu.html")
         lines.append("→ %s" % xuangu_url)
