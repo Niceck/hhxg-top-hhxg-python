@@ -1,0 +1,16 @@
+name: lint
+
+on: [push, pull_request]
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python 语法检查
+        run: |
+          python -m py_compile scripts/_common.py
+          python -m py_compile scripts/fetch_snapshot.py
+          python -m py_compile scripts/calendar.py
+          python -m py_compile scripts/margin.py
+          python -m py_compile scripts/news.py

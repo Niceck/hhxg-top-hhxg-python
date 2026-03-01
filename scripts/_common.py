@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
+import urllib.error
 import urllib.request
 
 BASE_URL = "https://hhxg.top/static/data"
@@ -16,28 +18,44 @@ HEADERS = {
 
 
 def fetch_json(path, cache_name=None):
-    """获取 JSON 数据，失败时用本地缓存兜底。
+    """获取 JSON 数据，网络抖动自动重试一次，失败时用本地缓存兜底。
 
     Returns (data, from_cache) 元组。
     """
     url = "%s/%s" % (BASE_URL, path)
     cache_file = os.path.join(CACHE_DIR, cache_name) if cache_name else None
 
-    try:
-        req = urllib.request.Request(url, headers=HEADERS)
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        if cache_file:
-            _save_cache(cache_file, data)
-        return data, False
-    except Exception:
-        if cache_file:
-            cached = _load_cache(cache_file)
-            if cached:
-                return cached, True
-        raise RuntimeError(
-            "数据服务暂时不可用，且无本地缓存。请稍后重试或直接访问 https://hhxg.top"
-        )
+    last_err = None
+    for attempt in range(2):
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            if cache_file:
+                _save_cache(cache_file, data)
+            return data, False
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                raise RuntimeError(
+                    "数据接口不存在 (404)，请升级技能：\n"
+                    "  cd ~/.claude/skills/hhxg-market && git pull"
+                )
+            raise RuntimeError("服务端错误 HTTP %s，请稍后重试" % e.code)
+        except json.JSONDecodeError:
+            raise RuntimeError("数据格式异常，服务端可能在维护，请稍后重试")
+        except urllib.error.URLError as e:
+            last_err = e
+            if attempt == 0:
+                time.sleep(1)
+
+    # 两次都失败，尝试缓存兜底
+    if cache_file:
+        cached = _load_cache(cache_file)
+        if cached:
+            return cached, True
+    raise RuntimeError(
+        "网络不可用，且无本地缓存。请稍后重试或直接访问 https://hhxg.top"
+    )
 
 
 def check_schema(data):
