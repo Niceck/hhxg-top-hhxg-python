@@ -20,12 +20,14 @@
 
 **Claude Code：**
 ```bash
-git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git ~/.claude/skills/hhxg-market
+git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git /tmp/hhxg-market && \
+  mv /tmp/hhxg-market ~/.claude/skills/hhxg-market
 ```
 
 **OpenClaw：**
 ```bash
-git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git ~/.openclaw/skills/hhxg-market
+git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git /tmp/hhxg-market && \
+  mv /tmp/hhxg-market ~/.openclaw/skills/hhxg-market
 ```
 
 ---
@@ -133,17 +135,16 @@ rm -rf ~/.claude/skills/hhxg-market
 ```
 ├── README.md
 ├── LICENSE
-└── skill/
-    ├── SKILL.md                  # Skill 定义文件
-    ├── scripts/
-    │   ├── _common.py            # 共用工具（HTTP、缓存、schema 检查）
-    │   ├── fetch_snapshot.py     # 日报快照
-    │   ├── calendar.py           # A 股日历
-    │   ├── margin.py             # 融资融券
-    │   ├── strategy.py           # 量化选股
-    │   └── news.py               # 实时快讯
-    └── references/
-        └── data-schema.md        # JSON 数据结构说明
+├── SKILL.md                  # Skill 定义文件
+├── scripts/
+│   ├── _common.py            # 共用工具（HTTP、缓存、schema 检查）
+│   ├── fetch_snapshot.py     # 日报快照
+│   ├── calendar.py           # A 股日历
+│   ├── margin.py             # 融资融券
+│   ├── strategy.py           # 量化选股
+│   └── news.py               # 实时快讯
+└── references/
+    └── data-schema.md        # JSON 数据结构说明
 ```
 
 ---

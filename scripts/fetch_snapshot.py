@@ -46,11 +46,19 @@ def fmt_market(data):
         "结构差值: %s  |  晋级率: %s" % (m.get("struct_diff", "?"), m.get("promotion_rate", "?")),
         "",
         "### 涨跌分布",
-        "| 区间 | 数量 |",
-        "|------|------|",
+        "| 区间 | 今日 | 昨日 | 变化 |",
+        "|------|------|------|------|",
     ]
+    _dir_map = {"up": "↑", "down": "↓"}
     for b in m.get("buckets", []):
-        lines.append("| %s | %s |" % (b.get("name", "?"), b.get("count", "?")))
+        prev = b.get("prev")
+        dir_sym = _dir_map.get(b.get("dir", ""), "-")
+        lines.append("| %s | %s | %s | %s |" % (
+            b.get("name", "?"),
+            b.get("count", "?"),
+            prev if prev is not None else "-",
+            dir_sym,
+        ))
     return "\n".join(lines)
 
 
@@ -65,7 +73,11 @@ def fmt_themes(data):
         "|---|------|--------|-----------|--------|",
     ]
     for i, t in enumerate(themes, 1):
-        leaders = ", ".join(s.get("name", "") for s in t.get("top_stocks", [])[:3])
+        leaders = " / ".join(
+            "%s(%s亿)" % (s.get("name", ""), s["net_yi"]) if s.get("net_yi") is not None
+            else s.get("name", "")
+            for s in t.get("top_stocks", [])[:3]
+        )
         net = t.get("net_yi", "-")
         lines.append("| %d | %s | %s | %s | %s |" % (i, t.get("name", ""), t.get("limitup_count", ""), net, leaders))
     return "\n".join(lines)
@@ -92,7 +104,7 @@ def fmt_ladder(data):
         boards = level.get("boards", "?")
         stocks = level.get("stocks", [])
         names = " / ".join(
-            "%s(%s)" % (s.get("name", ""), s.get("code", "")) for s in stocks[:8]
+            "%s(%s)" % (s.get("name", ""), s.get("industry", s.get("code", ""))) for s in stocks[:8]
         )
         lines.append("### %s板（%s 只）" % (boards, level.get("count", len(stocks))))
         lines.append(names)
@@ -101,8 +113,8 @@ def fmt_ladder(data):
     rates = ld.get("lb_rates_map", {})
     if rates:
         lines.append("### 晋级率")
-        for k, v in rates.items():
-            lines.append("- %s: %s" % (k, v))
+        for k, v in sorted(rates.items(), key=lambda x: int(x[0])):
+            lines.append("- %s板→%s板: %s" % (k, int(k) + 1, v))
 
     areas = ld.get("area_counts", {})
     if areas:
@@ -146,7 +158,7 @@ def fmt_hotmoney(data):
         for seat in seats[:10]:
             stocks_str = ", ".join(
                 "%s(%s亿)" % (st.get("name", ""), st.get("net_yi", ""))
-                for st in seat.get("stocks", [])[:5]
+                for st in seat.get("stocks", [])
             )
             lines.append("- **%s**: %s" % (seat.get("name", ""), stocks_str))
 

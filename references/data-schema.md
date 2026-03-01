@@ -52,7 +52,7 @@ URL: `assistant/skill_snapshot.json`
 | `struct_diff` | 结构差值 |
 | `promotion_rate` | 晋级率 |
 | `total` | 个股总数 |
-| `buckets` | 涨跌分布 `[{name, count}]` |
+| `buckets` | 涨跌分布 `[{name, count, prev, dir}]`，`prev` 为昨日同区间数量，`dir` 为 `"up"` / `"down"` / `""` |
 
 ### hot_themes 元素
 
@@ -61,7 +61,7 @@ URL: `assistant/skill_snapshot.json`
 | `name` | 题材名称 |
 | `limitup_count` | 涨停数 |
 | `net_yi` | 净流入(亿) |
-| `top_stocks` | 龙头股 `[{name, code, change_pct}]` |
+| `top_stocks` | 龙头股 `[{name, net_yi}]`，`net_yi` 为该股游资净买入(亿) |
 
 ### sectors 元素 (SectorGroup)
 
@@ -86,7 +86,7 @@ SectorItem: `{name, net_yi, leader, bias_pct}`
 | 字段 | 说明 |
 |------|------|
 | `levels` | 各级连板 `[{boards, count, stocks}]` |
-| `lb_rates_map` | 晋级率 `{"2进3": "33%", ...}` |
+| `lb_rates_map` | 晋级率 `{"2": "9.6%", "3": "60.0%", ...}`，key 为起始板数字符串 |
 | `area_counts` | 地域分布 `{name: count, ...}` |
 | `concept_counts` | 概念分布 `{name: count, ...}` |
 

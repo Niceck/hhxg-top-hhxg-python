@@ -180,13 +180,20 @@ def main():
         months = {mon[:7], sun[:7]}  # 可能跨两个月
         all_events = []
         for month in sorted(months):
-            for kind in ("unlock", "earnings", "delivery"):
+            for kind in ("unlock", "earnings"):
                 try:
                     edata, _ = _fetch_events(kind, month)
                     evts = edata.get("events", []) if isinstance(edata, dict) else []
                     all_events.extend(evts)
                 except RuntimeError:
                     pass
+        # delivery 按年拉取，只拉一次避免重复
+        try:
+            edata, _ = _fetch_events("delivery", "")
+            evts = edata.get("events", []) if isinstance(edata, dict) else []
+            all_events.extend(evts)
+        except RuntimeError:
+            pass
         print_cache_hint(cached1, mon[:7])
         if use_json:
             print(json.dumps({"trading_days": trading_days, "events": all_events}, ensure_ascii=False, indent=2))
