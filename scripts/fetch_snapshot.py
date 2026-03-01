@@ -474,6 +474,16 @@ def main():
     check_schema(data)
     print_cache_hint(from_cache, data.get("date", ""))
 
+    # 数据日期 ≠ 今天时，提示数据截止日期及更新时间
+    data_date = data.get("date", "")
+    today = datetime.now().strftime("%Y-%m-%d")
+    if data_date and data_date != today:
+        print(
+            "NOTE: 以下为 %s 的数据（最近交易日）。"
+            "每个交易日盘后约 20:00 更新，今日数据尚未发布。\n" % data_date,
+            file=sys.stderr,
+        )
+
     if use_json:
         print(json.dumps(data, ensure_ascii=False, indent=2))
     else:
