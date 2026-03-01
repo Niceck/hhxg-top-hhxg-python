@@ -13,7 +13,7 @@
   <!-- 内容 -->
   <text x="20" y="71" font-family="monospace" font-size="13"><tspan fill="#61AFEF" font-weight="bold"># 连板天梯 — 2026-02-27</tspan></text>
   <text x="20" y="90" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"></tspan></text>
-  <text x="20" y="109" font-family="monospace" font-size="13"><tspan fill="#ABB2BF">最高连板: <tspan font-weight="bold" fill="#E<tspan fill="#56B6C2">5</tspan>C<tspan fill="#56B6C2">07</tspan>B"><tspan fill="#56B6C2">7板</tspan></tspan> — 豫能控股 (电力)</tspan></text>
+  <text x="20" y="109" font-family="monospace" font-size="13"><tspan fill="#ABB2BF">最高连板: <tspan font-weight="bold" fill="#E5C07B"><tspan fill="#56B6C2">7板</tspan></tspan> — 豫能控股 (电力)</tspan></text>
   <text x="20" y="128" font-family="monospace" font-size="13"><tspan fill="#ABB2BF">涨停总数: <tspan fill="#56B6C2">75</tspan></tspan></text>
   <text x="20" y="147" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"></tspan></text>
   <text x="20" y="166" font-family="monospace" font-size="13"><tspan fill="#61AFEF" font-weight="bold">### 7板（1 只）</tspan></text>
@@ -46,11 +46,11 @@
   <text x="20" y="679" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"></tspan></text>
   <text x="20" y="698" font-family="monospace" font-size="13"><tspan fill="#ABB2BF">区间: <tspan fill="#56B6C2">2026-02-11</tspan> ~ <tspan fill="#56B6C2">2026-02-26</tspan></tspan></text>
   <text x="20" y="717" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"></tspan></text>
-  <text x="20" y="736" font-family="monospace" font-size="13"><tspan fill="#ABB2BF">最新融资余额: <tspan font-weight="bold" fill="#E<tspan fill="#56B6C2">5</tspan>C<tspan fill="#56B6C2">07</tspan>B"><tspan fill="#56B6C2">26382</tspan> 亿</tspan></tspan></text>
-  <text x="20" y="755" font-family="monospace" font-size="13"><tspan fill="#ABB2BF">最新融券余额: <tspan font-weight="bold" fill="#E<tspan fill="#56B6C2">5</tspan>C<tspan fill="#56B6C2">07</tspan>B"><tspan fill="#56B6C2">170.4</tspan> 亿</tspan></tspan></text>
+  <text x="20" y="736" font-family="monospace" font-size="13"><tspan fill="#ABB2BF">最新融资余额: <tspan font-weight="bold" fill="#E5C07B"><tspan fill="#56B6C2">26382</tspan> 亿</tspan></tspan></text>
+  <text x="20" y="755" font-family="monospace" font-size="13"><tspan fill="#ABB2BF">最新融券余额: <tspan font-weight="bold" fill="#E5C07B"><tspan fill="#56B6C2">170.4</tspan> 亿</tspan></tspan></text>
   <text x="20" y="774" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"></tspan></text>
-  <text x="20" y="793" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"><tspan fill="#56B6C2">7</tspan> 日融资变化: <tspan font-weight="bold" fill="#E<tspan fill="#56B6C2">5</tspan>C<tspan fill="#56B6C2">07</tspan>B">+<tspan fill="#56B6C2">225.8</tspan> 亿</tspan></tspan></text>
-  <text x="20" y="812" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"><tspan fill="#56B6C2">7</tspan> 日融券变化: <tspan font-weight="bold" fill="#E<tspan fill="#56B6C2">5</tspan>C<tspan fill="#56B6C2">07</tspan>B">+<tspan fill="#56B6C2">4.3</tspan> 亿</tspan></tspan></text>
+  <text x="20" y="793" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"><tspan fill="#56B6C2">7</tspan> 日融资变化: <tspan font-weight="bold" fill="#E5C07B">+<tspan fill="#56B6C2">225.8</tspan> 亿</tspan></tspan></text>
+  <text x="20" y="812" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"><tspan fill="#56B6C2">7</tspan> 日融券变化: <tspan font-weight="bold" fill="#E5C07B">+<tspan fill="#56B6C2">4.3</tspan> 亿</tspan></tspan></text>
   <text x="20" y="831" font-family="monospace" font-size="13"><tspan fill="#ABB2BF"></tspan></text>
   <text x="20" y="850" font-family="monospace" font-size="13"><tspan fill="#61AFEF" font-weight="bold">### 每日余额</tspan></text>
   <text x="20" y="869" font-family="monospace" font-size="13"><tspan fill="#5C6370">|</tspan><tspan fill="#ABB2BF">  日期  </tspan><tspan fill="#5C6370">|</tspan><tspan fill="#ABB2BF">  融资余额(亿)  </tspan><tspan fill="#5C6370">|</tspan><tspan fill="#ABB2BF">  融券余额(亿)  </tspan><tspan fill="#5C6370">|</tspan><tspan fill="#5C6370">|</tspan></text>

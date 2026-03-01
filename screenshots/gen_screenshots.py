@@ -84,8 +84,9 @@ def _color_line(raw: str) -> str:
         prefix = '• '
         body = re.sub(r'^  ?[-•] ', '', line)
         body_e = _esc(body)
-        body_e = re.sub(r'\*\*(.+?)\*\*', '<tspan font-weight="bold" fill="%s">\\1</tspan>' % BOLD, body_e)
+        # 先数字、再粗体，避免粗体颜色码 #E5C07B 里的数字被误匹配
         body_e = re.sub(r'(\d[\d.,亿%+\-只板]*)', '<tspan fill="%s">\\1</tspan>' % CYAN, body_e)
+        body_e = re.sub(r'\*\*(.+?)\*\*', '<tspan font-weight="bold" fill="%s">\\1</tspan>' % BOLD, body_e)
         return '<tspan fill="%s">%s</tspan><tspan fill="%s">%s</tspan>' % (COMMENT, prefix, TEXT, body_e)
 
     # ### 子标题
@@ -95,8 +96,9 @@ def _color_line(raw: str) -> str:
 
     # 普通行（处理 ** **）
     line_e = _esc(line)
-    line_e = re.sub(r'\*\*(.+?)\*\*', '<tspan font-weight="bold" fill="%s">\\1</tspan>' % BOLD, line_e)
+    # 先数字、再粗体，避免粗体颜色码 #E5C07B 里的数字被误匹配
     line_e = re.sub(r'(\d[\d.,亿%+\-只板]*)', '<tspan fill="%s">\\1</tspan>' % CYAN, line_e)
+    line_e = re.sub(r'\*\*(.+?)\*\*', '<tspan font-weight="bold" fill="%s">\\1</tspan>' % BOLD, line_e)
     # → 链接引导
     if '→' in line_e or 'https://' in line_e:
         line_e = line_e.replace('→', '<tspan fill="%s">→</tspan>' % GREEN)
@@ -153,7 +155,7 @@ def run_script(script: str, *args) -> list[str]:
     here = os.path.dirname(os.path.abspath(__file__))
     scripts_dir = os.path.join(here, "..", "scripts")
     cmd = [sys.executable, os.path.join(scripts_dir, script)] + list(args)
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
+    result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', timeout=20)
     return result.stdout.splitlines()
 
 
