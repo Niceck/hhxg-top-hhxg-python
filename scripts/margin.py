@@ -9,6 +9,7 @@ Usage:
 
 数据来源: https://hhxg.top
 """
+
 from __future__ import annotations
 
 import json
@@ -32,22 +33,22 @@ def fmt_overview(data):
     lines = [
         "# 融资融券市场总览（近 7 个交易日）",
         "",
-        "区间: %s ~ %s" % (win.get("start", "?"), win.get("end", "?")),
+        "区间: {} ~ {}".format(win.get("start", "?"), win.get("end", "?")),
         "",
     ]
     totals = mkt.get("daily_totals", [])
     if totals:
         latest = totals[-1]
-        lines.append("最新融资余额: **%.0f 亿**" % latest.get("rzye_yi", 0))
-        lines.append("最新融券余额: **%.1f 亿**" % latest.get("rqye_yi", 0))
+        lines.append("最新融资余额: **{:.0f} 亿**".format(latest.get("rzye_yi", 0)))
+        lines.append("最新融券余额: **{:.1f} 亿**".format(latest.get("rqye_yi", 0)))
         lines.append("")
 
     delta_rz = mkt.get("delta_rzye_yi", 0)
     delta_rq = mkt.get("delta_rqye_yi", 0)
     sign_rz = "+" if delta_rz > 0 else ""
     sign_rq = "+" if delta_rq > 0 else ""
-    lines.append("7 日融资变化: **%s%.1f 亿**" % (sign_rz, delta_rz))
-    lines.append("7 日融券变化: **%s%.1f 亿**" % (sign_rq, delta_rq))
+    lines.append(f"7 日融资变化: **{sign_rz}{delta_rz:.1f} 亿**")
+    lines.append(f"7 日融券变化: **{sign_rq}{delta_rq:.1f} 亿**")
     lines.append("")
 
     # 每日余额趋势
@@ -56,9 +57,11 @@ def fmt_overview(data):
         lines.append("| 日期 | 融资余额(亿) | 融券余额(亿) |")
         lines.append("|------|-------------|-------------|")
         for t in totals:
-            lines.append("| %s | %.0f | %.1f |" % (
-                t.get("date", ""), t.get("rzye_yi", 0), t.get("rqye_yi", 0)
-            ))
+            lines.append(
+                "| {} | {:.0f} | {:.1f} |".format(
+                    t.get("date", ""), t.get("rzye_yi", 0), t.get("rqye_yi", 0)
+                )
+            )
 
     return "\n".join(lines)
 
@@ -73,10 +76,14 @@ def fmt_top(data):
         lines.append("| 股票 | 最新余额(亿) | 变化(亿) | 变化% |")
         lines.append("|------|-------------|---------|-------|")
         for s in inc[:10]:
-            lines.append("| %s | %.1f | +%.1f | +%.1f%% |" % (
-                s.get("name", ""), s.get("latest_rzye_yi", 0),
-                s.get("delta_rzye_yi", 0), s.get("delta_pct", 0),
-            ))
+            lines.append(
+                "| {} | {:.1f} | +{:.1f} | +{:.1f}% |".format(
+                    s.get("name", ""),
+                    s.get("latest_rzye_yi", 0),
+                    s.get("delta_rzye_yi", 0),
+                    s.get("delta_pct", 0),
+                )
+            )
 
     dec = top.get("decrease_rzye", [])
     if dec:
@@ -85,10 +92,14 @@ def fmt_top(data):
         lines.append("| 股票 | 最新余额(亿) | 变化(亿) | 变化% |")
         lines.append("|------|-------------|---------|-------|")
         for s in dec[:10]:
-            lines.append("| %s | %.1f | %.1f | %.1f%% |" % (
-                s.get("name", ""), s.get("latest_rzye_yi", 0),
-                s.get("delta_rzye_yi", 0), s.get("delta_pct", 0),
-            ))
+            lines.append(
+                "| {} | {:.1f} | {:.1f} | {:.1f}% |".format(
+                    s.get("name", ""),
+                    s.get("latest_rzye_yi", 0),
+                    s.get("delta_rzye_yi", 0),
+                    s.get("delta_pct", 0),
+                )
+            )
 
     return "\n".join(lines)
 

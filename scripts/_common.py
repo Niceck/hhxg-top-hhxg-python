@@ -1,4 +1,5 @@
 """共用工具：HTTP 请求 + 本地缓存 + schema 检查。"""
+
 from __future__ import annotations
 
 import json
@@ -22,7 +23,7 @@ def fetch_json(path, cache_name=None):
 
     Returns (data, from_cache) 元组。
     """
-    url = "%s/%s" % (BASE_URL, path)
+    url = f"{BASE_URL}/{path}"
     cache_file = os.path.join(CACHE_DIR, cache_name) if cache_name else None
 
     last_err = None
@@ -40,7 +41,7 @@ def fetch_json(path, cache_name=None):
                     "数据接口不存在 (404)，请升级技能：\n"
                     "  cd ~/.claude/skills/hhxg-market && git pull"
                 )
-            raise RuntimeError("服务端错误 HTTP %s，请稍后重试" % e.code)
+            raise RuntimeError(f"服务端错误 HTTP {e.code}，请稍后重试")
         except json.JSONDecodeError:
             raise RuntimeError("数据格式异常，服务端可能在维护，请稍后重试")
         except urllib.error.URLError as e:
@@ -64,8 +65,8 @@ def check_schema(data):
     ver = meta.get("schema_version", SUPPORTED_SCHEMA)
     if ver > SUPPORTED_SCHEMA:
         print(
-            "WARNING: 数据格式已更新 (v%s)，当前技能支持 v%s，建议升级：\n"
-            "  cd ~/.claude/skills/hhxg-market && git pull\n" % (ver, SUPPORTED_SCHEMA),
+            f"WARNING: 数据格式已更新 (v{ver})，当前技能支持 v{SUPPORTED_SCHEMA}，建议升级：\n"
+            "  cd ~/.claude/skills/hhxg-market && git pull\n",
             file=sys.stderr,
         )
 
@@ -74,7 +75,7 @@ def print_cache_hint(from_cache, date_str):
     """缓存兜底时输出提示。"""
     if from_cache:
         print(
-            "NOTE: 网络不可用，以下为本地缓存数据（%s）\n" % date_str,
+            f"NOTE: 网络不可用，以下为本地缓存数据（{date_str}）\n",
             file=sys.stderr,
         )
 
@@ -87,8 +88,8 @@ def run_main(sections, default="all"):
 
     section = args[0] if args else default
     if section not in sections:
-        print("未知板块: %s" % section)
-        print("可选: %s" % ", ".join(sections))
+        print(f"未知板块: {section}")
+        print("可选: {}".format(", ".join(sections)))
         sys.exit(1)
 
     return section, args[1:], use_json
@@ -105,7 +106,7 @@ def _save_cache(path, data):
 
 def _load_cache(path):
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)
     except (OSError, json.JSONDecodeError):
         return None

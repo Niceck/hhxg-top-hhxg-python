@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """生成 macOS 终端风格 SVG 截图。运行一次即可，产物提交到 screenshots/"""
+
 from __future__ import annotations
 import html
 import os
@@ -9,26 +10,26 @@ import sys
 import textwrap
 
 # ── 配色（One Dark Pro） ────────────────────────────────────────
-BG         = "#282C34"
-TITLE_BAR  = "#21252B"
-TEXT       = "#ABB2BF"
-BOLD       = "#E5C07B"
-HEADING    = "#61AFEF"
-COMMENT    = "#5C6370"
-GREEN      = "#98C379"
-RED        = "#E06C75"
-CYAN       = "#56B6C2"
-DOT_RED    = "#FF5F56"
-DOT_YEL    = "#FFBD2E"
-DOT_GRN    = "#27C93F"
+BG = "#282C34"
+TITLE_BAR = "#21252B"
+TEXT = "#ABB2BF"
+BOLD = "#E5C07B"
+HEADING = "#61AFEF"
+COMMENT = "#5C6370"
+GREEN = "#98C379"
+RED = "#E06C75"
+CYAN = "#56B6C2"
+DOT_RED = "#FF5F56"
+DOT_YEL = "#FFBD2E"
+DOT_GRN = "#27C93F"
 
 FONT = "monospace"
-FONT_SIZE  = 13
-LINE_H     = 19
-PAD_X      = 20
-PAD_Y_TOP  = 52   # 标题栏高度
-PAD_Y_BOT  = 20
-MAX_COLS   = 80   # 行宽截断
+FONT_SIZE = 13
+LINE_H = 19
+PAD_X = 20
+PAD_Y_TOP = 52  # 标题栏高度
+PAD_Y_BOT = 20
+MAX_COLS = 80  # 行宽截断
 
 
 def _esc(s: str) -> str:
@@ -40,71 +41,83 @@ def _color_line(raw: str) -> str:
     line = raw[:MAX_COLS]  # 截断过长行
 
     # 标题 #
-    if re.match(r'^#{1,3} ', line):
-        text = re.sub(r'^#{1,3} ', '', line)
-        return '<tspan fill="%s" font-weight="bold">%s</tspan>' % (HEADING, _esc(line))
+    if re.match(r"^#{1,3} ", line):
+        text = re.sub(r"^#{1,3} ", "", line)
+        return f'<tspan fill="{HEADING}" font-weight="bold">{_esc(line)}</tspan>'
 
     # blockquote >
-    if line.startswith('> '):
+    if line.startswith("> "):
         inner = line[2:]
         # 处理 **...**
-        inner = re.sub(r'\*\*(.+?)\*\*', '<tspan fill="%s" font-weight="bold">\\1</tspan>' % BOLD, inner)
-        return '<tspan fill="%s">&gt; %s</tspan>' % (GREEN, inner)
+        inner = re.sub(
+            r"\*\*(.+?)\*\*",
+            f'<tspan fill="{BOLD}" font-weight="bold">\\1</tspan>',
+            inner,
+        )
+        return f'<tspan fill="{GREEN}">&gt; {inner}</tspan>'
 
     # 分隔线
-    if re.match(r'^-{3,}$', line.strip()):
-        return '<tspan fill="%s">%s</tspan>' % (COMMENT, _esc(line))
+    if re.match(r"^-{3,}$", line.strip()):
+        return f'<tspan fill="{COMMENT}">{_esc(line)}</tspan>'
 
     # 表格行
-    if line.startswith('|'):
+    if line.startswith("|"):
         # 表头/分隔行用不同色
-        if re.match(r'^\|[-| ]+\|$', line):
-            return '<tspan fill="%s">%s</tspan>' % (COMMENT, _esc(line))
-        parts = line.split('|')
-        result = ''
+        if re.match(r"^\|[-| ]+\|$", line):
+            return f'<tspan fill="{COMMENT}">{_esc(line)}</tspan>'
+        parts = line.split("|")
+        result = ""
         for i, p in enumerate(parts):
             p_e = _esc(p)
             if i == 0 or i == len(parts) - 1:
-                result += '<tspan fill="%s">|</tspan>' % COMMENT
+                result += f'<tspan fill="{COMMENT}">|</tspan>'
             else:
                 # 数字高亮
                 p_colored = re.sub(
-                    r'(\d[\d.,亿%+\-只板]*)',
-                    '<tspan fill="%s">\\1</tspan>' % CYAN,
-                    p_e
+                    r"(\d[\d.,亿%+\-只板]*)", f'<tspan fill="{CYAN}">\\1</tspan>', p_e
                 )
                 # ↑ ↓
-                p_colored = p_colored.replace('↑', '<tspan fill="%s">↑</tspan>' % GREEN)
-                p_colored = p_colored.replace('↓', '<tspan fill="%s">↓</tspan>' % RED)
-                result += '<tspan fill="%s"> %s </tspan><tspan fill="%s">|</tspan>' % (TEXT, p_colored, COMMENT)
+                p_colored = p_colored.replace("↑", f'<tspan fill="{GREEN}">↑</tspan>')
+                p_colored = p_colored.replace("↓", f'<tspan fill="{RED}">↓</tspan>')
+                result += f'<tspan fill="{TEXT}"> {p_colored} </tspan><tspan fill="{COMMENT}">|</tspan>'
         return result
 
     # 无序列表 - / •
-    if re.match(r'^[-•] ', line) or re.match(r'^  [-•] ', line):
-        prefix = '• '
-        body = re.sub(r'^  ?[-•] ', '', line)
+    if re.match(r"^[-•] ", line) or re.match(r"^  [-•] ", line):
+        prefix = "• "
+        body = re.sub(r"^  ?[-•] ", "", line)
         body_e = _esc(body)
         # 先数字、再粗体，避免粗体颜色码 #E5C07B 里的数字被误匹配
-        body_e = re.sub(r'(\d[\d.,亿%+\-只板]*)', '<tspan fill="%s">\\1</tspan>' % CYAN, body_e)
-        body_e = re.sub(r'\*\*(.+?)\*\*', '<tspan font-weight="bold" fill="%s">\\1</tspan>' % BOLD, body_e)
-        return '<tspan fill="%s">%s</tspan><tspan fill="%s">%s</tspan>' % (COMMENT, prefix, TEXT, body_e)
+        body_e = re.sub(
+            r"(\d[\d.,亿%+\-只板]*)", f'<tspan fill="{CYAN}">\\1</tspan>', body_e
+        )
+        body_e = re.sub(
+            r"\*\*(.+?)\*\*",
+            f'<tspan font-weight="bold" fill="{BOLD}">\\1</tspan>',
+            body_e,
+        )
+        return f'<tspan fill="{COMMENT}">{prefix}</tspan><tspan fill="{TEXT}">{body_e}</tspan>'
 
     # ### 子标题
-    if re.match(r'^### ', line):
+    if re.match(r"^### ", line):
         text = line[4:]
-        return '<tspan fill="%s" font-weight="bold">### %s</tspan>' % (CYAN, _esc(text))
+        return f'<tspan fill="{CYAN}" font-weight="bold">### {_esc(text)}</tspan>'
 
     # 普通行（处理 ** **）
     line_e = _esc(line)
     # 先数字、再粗体，避免粗体颜色码 #E5C07B 里的数字被误匹配
-    line_e = re.sub(r'(\d[\d.,亿%+\-只板]*)', '<tspan fill="%s">\\1</tspan>' % CYAN, line_e)
-    line_e = re.sub(r'\*\*(.+?)\*\*', '<tspan font-weight="bold" fill="%s">\\1</tspan>' % BOLD, line_e)
+    line_e = re.sub(
+        r"(\d[\d.,亿%+\-只板]*)", f'<tspan fill="{CYAN}">\\1</tspan>', line_e
+    )
+    line_e = re.sub(
+        r"\*\*(.+?)\*\*", f'<tspan font-weight="bold" fill="{BOLD}">\\1</tspan>', line_e
+    )
     # → 链接引导
-    if '→' in line_e or 'https://' in line_e:
-        line_e = line_e.replace('→', '<tspan fill="%s">→</tspan>' % GREEN)
-        line_e = re.sub(r'(https?://\S+)', '<tspan fill="%s">\\1</tspan>' % GREEN, line_e)
+    if "→" in line_e or "https://" in line_e:
+        line_e = line_e.replace("→", f'<tspan fill="{GREEN}">→</tspan>')
+        line_e = re.sub(r"(https?://\S+)", f'<tspan fill="{GREEN}">\\1</tspan>', line_e)
 
-    return '<tspan fill="%s">%s</tspan>' % (TEXT, line_e)
+    return f'<tspan fill="{TEXT}">{line_e}</tspan>'
 
 
 def render_svg(title: str, lines: list[str], width: int = 760) -> str:
@@ -120,8 +133,8 @@ def render_svg(title: str, lines: list[str], width: int = 760) -> str:
         y = PAD_Y_TOP + (i + 1) * LINE_H
         colored = _color_line(raw)
         rows.append(
-            '<text x="%d" y="%d" font-family="%s" font-size="%d">%s</text>'
-            % (PAD_X, y, FONT, FONT_SIZE, colored)
+            f'<text x="{PAD_X}" y="{y}" font-family="{FONT}" '
+            f'font-size="{FONT_SIZE}">{colored}</text>'
         )
 
     svg = textwrap.dedent("""\
@@ -141,9 +154,16 @@ def render_svg(title: str, lines: list[str], width: int = 760) -> str:
           {rows}
         </svg>
     """).format(
-        w=width, h=height, bg=BG, tb=TITLE_BAR,
-        dr=DOT_RED, dy=DOT_YEL, dg=DOT_GRN,
-        w2=width // 2, font=FONT, co=COMMENT,
+        w=width,
+        h=height,
+        bg=BG,
+        tb=TITLE_BAR,
+        dr=DOT_RED,
+        dy=DOT_YEL,
+        dg=DOT_GRN,
+        w2=width // 2,
+        font=FONT,
+        co=COMMENT,
         title=_esc(title),
         rows="\n  ".join(rows),
     )
@@ -155,7 +175,9 @@ def run_script(script: str, *args) -> list[str]:
     here = os.path.dirname(os.path.abspath(__file__))
     scripts_dir = os.path.join(here, "..", "scripts")
     cmd = [sys.executable, os.path.join(scripts_dir, script)] + list(args)
-    result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', timeout=20)
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, encoding="utf-8", timeout=20
+    )
     return result.stdout.splitlines()
 
 

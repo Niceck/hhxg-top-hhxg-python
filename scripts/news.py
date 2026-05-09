@@ -8,6 +8,7 @@ Usage:
 
 数据来源: https://hhxg.top
 """
+
 from __future__ import annotations
 
 import json
@@ -25,7 +26,7 @@ def _fetch():
 def fmt_news(items, limit=20):
     if not items:
         return "暂无快讯数据"
-    lines = ["# 财经快讯（最新 %d 条）" % min(limit, len(items)), ""]
+    lines = [f"# 财经快讯（最新 {min(limit, len(items))} 条）", ""]
 
     current_date = ""
     for n in items[:limit]:
@@ -38,11 +39,11 @@ def fmt_news(items, limit=20):
         if date_part != current_date:
             current_date = date_part
             lines.append("")
-            lines.append("## %s" % date_part)
+            lines.append(f"## {date_part}")
 
         time_part = t.split("T")[1][:5] if "T" in t else t
-        tag = "[%s]" % cat if cat else ""
-        lines.append("- `%s` %s %s" % (time_part, tag, title))
+        tag = f"[{cat}]" if cat else ""
+        lines.append(f"- `{time_part}` {tag} {title}")
 
     lines.append("")
     lines.append("---")

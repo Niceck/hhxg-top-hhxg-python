@@ -12,6 +12,7 @@ Usage:
 
 数据来源: https://hhxg.top
 """
+
 from __future__ import annotations
 
 import json
@@ -33,19 +34,17 @@ def _this_week():
 
 
 def _fetch_trading_days():
-    data, cached = fetch_json(
-        "calendar/trading_days_%s.json" % YEAR, "trading_days.json"
-    )
+    data, cached = fetch_json(f"calendar/trading_days_{YEAR}.json", "trading_days.json")
     return data, cached
 
 
 def _fetch_events(kind, month):
     """kind: delivery/earnings/unlock, month: 2026-03 或空。"""
     if kind == "delivery":
-        path = "calendar/delivery_%s.json" % YEAR
+        path = f"calendar/delivery_{YEAR}.json"
     else:
-        path = "calendar/%s_%s.json" % (kind, month.replace("-", ""))
-    return fetch_json(path, "%s_%s.json" % (kind, month or YEAR))
+        path = "calendar/{}_{}.json".format(kind, month.replace("-", ""))
+    return fetch_json(path, f"{kind}_{month or YEAR}.json")
 
 
 # ── Formatters ──────────────────────────────────────────────
@@ -61,21 +60,21 @@ def fmt_trading(data, args):
     days = data if isinstance(data, list) else data.get("days", data)
     is_trading = target in days
     if is_trading:
-        return "%s 是交易日" % target
+        return f"{target} 是交易日"
     # 找下一个交易日
     nxt = ""
     for d in sorted(days):
         if d > target:
             nxt = d
             break
-    hint = "，下一个交易日是 %s" % nxt if nxt else ""
-    return "%s 不是交易日（休市）%s" % (target, hint)
+    hint = f"，下一个交易日是 {nxt}" if nxt else ""
+    return f"{target} 不是交易日（休市）{hint}"
 
 
 def fmt_events(events, title):
     if not events:
-        return "暂无%s数据" % title
-    lines = ["# %s" % title, ""]
+        return f"暂无{title}数据"
+    lines = [f"# {title}", ""]
     # 同日期多个事件合并为一行（如 ETF期权交割 + 富时A50交割同天）
     prev_date = ""
     for e in events:
@@ -83,17 +82,17 @@ def fmt_events(events, title):
         label = e.get("label", "")
         desc = e.get("description", "")
         if date == prev_date:
-            lines.append("- ↳ %s — %s" % (label, desc))
+            lines.append(f"- ↳ {label} — {desc}")
         else:
-            lines.append("- **%s** %s — %s" % (date, label, desc))
+            lines.append(f"- **{date}** {label} — {desc}")
         prev_date = date
         # 解禁/业绩的 top_companies
         tops = e.get("top_companies", [])
         if tops:
             names = ", ".join(
-                "%s(%s)" % (c.get("name", ""), c.get("value", "")) for c in tops[:5]
+                "{}({})".format(c.get("name", ""), c.get("value", "")) for c in tops[:5]
             )
-            lines.append("  %s" % names)
+            lines.append(f"  {names}")
     return "\n".join(lines)
 
 
@@ -106,10 +105,10 @@ def fmt_week(trading_days, all_events):
     week_td = [d for d in trading_days if mon <= d <= sun]
     is_today_trading = today in trading_days
     lines = [
-        "# 本周 A 股日历（%s ~ %s）" % (mon, sun),
+        f"# 本周 A 股日历（{mon} ~ {sun}）",
         "",
-        "今天 %s %s交易日" % (today, "是" if is_today_trading else "不是"),
-        "本周交易日: %s" % ", ".join(week_td) if week_td else "本周无交易日",
+        "今天 {} {}交易日".format(today, "是" if is_today_trading else "不是"),
+        "本周交易日: {}".format(", ".join(week_td)) if week_td else "本周无交易日",
         "",
     ]
 
@@ -119,11 +118,13 @@ def fmt_week(trading_days, all_events):
         lines.append("## 本周重要事件")
         for e in sorted(week_events, key=lambda x: x.get("date", "")):
             lines.append(
-                "- **%s** [%s] %s" % (e.get("date", ""), e.get("type", ""), e.get("label", ""))
+                "- **{}** [{}] {}".format(
+                    e.get("date", ""), e.get("type", ""), e.get("label", "")
+                )
             )
             desc = e.get("description", "")
             if desc:
-                lines.append("  %s" % desc)
+                lines.append(f"  {desc}")
     else:
         lines.append("本周无重大日历事件")
 
@@ -164,7 +165,9 @@ def main():
             print(json.dumps(data, ensure_ascii=False, indent=2))
         else:
             events = data.get("events", []) if isinstance(data, dict) else data
-            title = "限售解禁 — %s" % month if section == "unlock" else "业绩预告 — %s" % month
+            title = (
+                f"限售解禁 — {month}" if section == "unlock" else f"业绩预告 — {month}"
+            )
             print(fmt_events(events, title))
 
     elif section == "delivery":
@@ -174,7 +177,7 @@ def main():
             print(json.dumps(data, ensure_ascii=False, indent=2))
         else:
             events = data.get("events", []) if isinstance(data, dict) else data
-            print(fmt_events(events, "期货/期权交割日 — %s" % YEAR))
+            print(fmt_events(events, f"期货/期权交割日 — {YEAR}"))
 
     elif section == "week":
         td_data, cached1 = _fetch_trading_days()
@@ -200,7 +203,13 @@ def main():
             pass
         print_cache_hint(cached1, mon[:7])
         if use_json:
-            print(json.dumps({"trading_days": trading_days, "events": all_events}, ensure_ascii=False, indent=2))
+            print(
+                json.dumps(
+                    {"trading_days": trading_days, "events": all_events},
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
         else:
             print(fmt_week(trading_days, all_events))
 

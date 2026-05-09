@@ -49,7 +49,7 @@ def fmt_market(data):
     if yd_si is not None and isinstance(today_si, (int, float)):
         diff = round(today_si - yd_si, 1)
         sign = "+" if diff > 0 else ""
-        si_diff = "，昨 %s%%，%s%s%%" % (yd_si, sign, diff)
+        si_diff = f"，昨 {yd_si}%，{sign}{diff}%"
 
     # 涨停 + 昨日对比
     today_lu = m.get("limit_up", "?")
@@ -58,7 +58,7 @@ def fmt_market(data):
     if yd_lu is not None and isinstance(today_lu, int):
         diff = today_lu - yd_lu
         sign = "+" if diff > 0 else ""
-        lu_diff = "（昨%s，%s%s）" % (yd_lu, sign, diff)
+        lu_diff = f"（昨{yd_lu}，{sign}{diff}）"
 
     # 炸板 + 昨日对比
     today_fr = m.get("fried", "?")
@@ -67,24 +67,28 @@ def fmt_market(data):
     if yd_fr is not None and isinstance(today_fr, int):
         diff = today_fr - yd_fr
         sign = "+" if diff > 0 else ""
-        fr_diff = "（昨%s，%s%s）" % (yd_fr, sign, diff)
+        fr_diff = f"（昨{yd_fr}，{sign}{diff}）"
 
     lines = [
-        "# 市场赚钱效应 — %s" % data.get("date", ""),
+        "# 市场赚钱效应 — {}".format(data.get("date", "")),
         "",
-        "赚钱效应指数: **%s%%** (%s)%s" % (today_si, m.get("sentiment_label", "?"), si_diff),
-        "涨停 %s%s | 炸板 %s%s | 跌停 %s" % (
+        "赚钱效应指数: **{}%** ({}){}".format(
+            today_si, m.get("sentiment_label", "?"), si_diff
+        ),
+        "涨停 {}{} | 炸板 {}{} | 跌停 {}".format(
             today_lu, lu_diff, today_fr, fr_diff, m.get("limit_down", "?")
         ),
-        "结构差值: %s  |  晋级率: %s" % (m.get("struct_diff", "?"), m.get("promotion_rate", "?")),
+        "结构差值: {}  |  晋级率: {}".format(
+            m.get("struct_diff", "?"), m.get("promotion_rate", "?")
+        ),
     ]
 
     trend_label = comp.get("trend_label", "")
     trend_url = comp.get("trend_url", "")
     if trend_label:
-        lines.append("情绪趋势: **%s**" % trend_label)
+        lines.append(f"情绪趋势: **{trend_label}**")
     if trend_url:
-        lines.append("近期走势 → %s" % trend_url)
+        lines.append(f"近期走势 → {trend_url}")
 
     lines += [
         "",
@@ -96,12 +100,14 @@ def fmt_market(data):
     for b in m.get("buckets", []):
         prev = b.get("prev")
         dir_sym = _dir_map.get(b.get("dir", ""), "-")
-        lines.append("| %s | %s | %s | %s |" % (
-            b.get("name", "?"),
-            b.get("count", "?"),
-            prev if prev is not None else "-",
-            dir_sym,
-        ))
+        lines.append(
+            "| {} | {} | {} | {} |".format(
+                b.get("name", "?"),
+                b.get("count", "?"),
+                prev if prev is not None else "-",
+                dir_sym,
+            )
+        )
     return "\n".join(lines)
 
 
@@ -110,19 +116,24 @@ def fmt_themes(data):
     if not themes:
         return "暂无热门题材数据"
     lines = [
-        "# 热门题材 — %s" % data.get("date", ""),
+        "# 热门题材 — {}".format(data.get("date", "")),
         "",
         "| # | 题材 | 涨停数 | 游资净流入(亿) | 龙头股 |",
         "|---|------|--------|--------------|--------|",
     ]
     for i, t in enumerate(themes, 1):
         leaders = " / ".join(
-            "%s(%s亿)" % (s.get("name", ""), s["net_yi"]) if s.get("net_yi") is not None
+            "{}({}亿)".format(s.get("name", ""), s["net_yi"])
+            if s.get("net_yi") is not None
             else s.get("name", "")
             for s in t.get("top_stocks", [])[:3]
         )
         net = t.get("net_yi", "-")
-        lines.append("| %d | %s | %s | %s | %s |" % (i, t.get("name", ""), t.get("limitup_count", ""), net, leaders))
+        lines.append(
+            "| {} | {} | {} | {} | {} |".format(
+                i, t.get("name", ""), t.get("limitup_count", ""), net, leaders
+            )
+        )
     return "\n".join(lines)
 
 
@@ -135,14 +146,14 @@ def fmt_ladder(data):
     rates = ld.get("lb_rates_map", {})
 
     lines = [
-        "# 连板天梯 — %s" % data.get("date", ""),
+        "# 连板天梯 — {}".format(data.get("date", "")),
         "",
-        "最高连板: **%s板** — %s (%s)" % (
+        "最高连板: **{}板** — {} ({})".format(
             ladder.get("max_streak", "?"),
             ts.get("name", "?"),
             ts.get("industry", ""),
         ),
-        "涨停总数: %s" % ladder.get("total_limit_up", "?"),
+        "涨停总数: {}".format(ladder.get("total_limit_up", "?")),
         "",
     ]
 
@@ -154,35 +165,39 @@ def fmt_ladder(data):
 
         # 本级晋级率：key=boards 表示「boards板→boards+1板」的成功率
         rate = rates.get(str(boards), "")
-        rate_str = "  · 晋级率 %s →%s板" % (rate, int(boards) + 1) if rate else ""
+        rate_str = f"  · 晋级率 {rate} →{int(boards) + 1}板" if rate else ""
 
         # 区分晋级成功和失败的股票
         success_stocks = [s for s in stocks if s.get("is_success", True)]
         fail_stocks = [s for s in stocks if not s.get("is_success", True)]
 
         names = " / ".join(
-            ("%s(%s)" % (s.get("name", ""), ind) if (ind := s.get("industry", "")) else s.get("name", ""))
+            (
+                "{}({})".format(s.get("name", ""), ind)
+                if (ind := s.get("industry", ""))
+                else s.get("name", "")
+            )
             for s in success_stocks
         )
-        lines.append("### %s板（%s 只）%s" % (boards, count, rate_str))
+        lines.append(f"### {boards}板（{count} 只）{rate_str}")
         lines.append(names if names else "—")
         if fail_stocks:
             fail_names = " / ".join(s.get("name", "") for s in fail_stocks)
-            lines.append("晋级失败（%s只）: %s" % (fail_count, fail_names))
+            lines.append(f"晋级失败（{fail_count}只）: {fail_names}")
         lines.append("")
 
     areas = ld.get("area_counts", {})
     if areas:
         lines.append("### 地域分布 TOP 5")
         for name, count in list(areas.items())[:5]:
-            lines.append("- %s: %s 只" % (name, count))
+            lines.append(f"- {name}: {count} 只")
 
     concepts = ld.get("concept_counts", {})
     if concepts:
         lines.append("")
         lines.append("### 概念分布 TOP 5")
         for name, count in list(concepts.items())[:5]:
-            lines.append("- %s: %s 只" % (name, count))
+            lines.append(f"- {name}: {count} 只")
 
     return "\n".join(lines)
 
@@ -192,18 +207,22 @@ def fmt_hotmoney(data):
     if not hm:
         return "暂无游资数据"
     lines = [
-        "# 游资龙虎榜 — %s" % data.get("date", ""),
+        "# 游资龙虎榜 — {}".format(data.get("date", "")),
         "",
-        "龙虎榜总净买入: **%s 亿**" % hm.get("total_net_yi", "?"),
+        "龙虎榜总净买入: **{} 亿**".format(hm.get("total_net_yi", "?")),
         "",
         "### 净买入 TOP",
         "| 股票 | 净买入(亿) | 占比 |",
         "|------|-----------|------|",
     ]
     for b in hm.get("top_net_buy", []):
-        lines.append("| %s | %s | %s%% |" % (
-            b.get("name", "-"), b.get("net_yi", "-"), b.get("ratio_pct", "-"),
-        ))
+        lines.append(
+            "| {} | {} | {}% |".format(
+                b.get("name", "-"),
+                b.get("net_yi", "-"),
+                b.get("ratio_pct", "-"),
+            )
+        )
 
     seats = hm.get("seats", [])
     if seats:
@@ -218,17 +237,17 @@ def fmt_hotmoney(data):
                 buy = buy[:8]
                 sell = sell[:4]
             buy_str = "、".join(
-                "%s(+%.2f亿)" % (s["name"], s["net_yi"]) for s in buy
+                "{}(+{:.2f}亿)".format(s["name"], s["net_yi"]) for s in buy
             )
             sell_str = "、".join(
-                "%s(%.2f亿)" % (s["name"], s["net_yi"]) for s in sell
+                "{}({:.2f}亿)".format(s["name"], s["net_yi"]) for s in sell
             )
             parts = []
             if buy_str:
                 parts.append("买 " + buy_str)
             if sell_str:
                 parts.append("卖 " + sell_str)
-            lines.append("- **%s**: %s" % (seat.get("name", ""), " | ".join(parts)))
+            lines.append("- **{}**: {}".format(seat.get("name", ""), " | ".join(parts)))
 
     return "\n".join(lines)
 
@@ -237,25 +256,27 @@ def fmt_sectors(data):
     sectors = data.get("sectors", [])
     if not sectors:
         return "暂无行业资金数据"
-    lines = ["# 行业资金流向 — %s" % data.get("date", "")]
+    lines = ["# 行业资金流向 — {}".format(data.get("date", ""))]
     for group in sectors:
         label = group.get("label", "")
-        lines.append("\n## %s" % label)
+        lines.append(f"\n## {label}")
         for section_key in ("strong", "weak"):
             section = group.get(section_key, [])
             if not section:
                 continue
             tag = "强势" if section_key == "strong" else "弱势"
-            lines.append("\n### %s" % tag)
+            lines.append(f"\n### {tag}")
             lines.append("| 板块 | 净流入(亿) | 龙头股 | 偏离度 |")
             lines.append("|------|-----------|--------|--------|")
             for item in section:
-                lines.append("| %s | %s | %s | %s%% |" % (
-                    item.get("name", "-"),
-                    item.get("net_yi", "-"),
-                    item.get("leader", "-"),
-                    item.get("bias_pct", "-"),
-                ))
+                lines.append(
+                    "| {} | {} | {} | {}% |".format(
+                        item.get("name", "-"),
+                        item.get("net_yi", "-"),
+                        item.get("leader", "-"),
+                        item.get("bias_pct", "-"),
+                    )
+                )
     return "\n".join(lines)
 
 
@@ -263,14 +284,14 @@ def fmt_news(data):
     macro = data.get("macro_news", [])
     if not macro:
         return "暂无新闻数据"
-    lines = ["# 宏观新闻 — %s" % data.get("date", ""), ""]
+    lines = ["# 宏观新闻 — {}".format(data.get("date", "")), ""]
     for n in macro[:6]:
         t = n.get("t", "")
         if "T" in t:
             t = t.split("T")[1][:5]
         cat = n.get("cat", "")
-        tag = "[%s] " % cat if cat else ""
-        lines.append("- `%s` %s%s" % (t, tag, n.get("title", "")))
+        tag = f"[{cat}] " if cat else ""
+        lines.append("- `{}` {}{}".format(t, tag, n.get("title", "")))
     return "\n".join(lines)
 
 
@@ -280,14 +301,14 @@ def fmt_ai_summary(data):
     if not ai:
         return ""
     if isinstance(ai, str):
-        return "> %s" % ai
+        return f"> {ai}"
     if not isinstance(ai, dict):
         return ""
     # 构建摘要块：一句话总览 + 关键要点
     lines = []
     headline = ai.get("market_state", "")
     if headline:
-        lines.append("> **%s**" % headline)
+        lines.append(f"> **{headline}**")
     bullets = [
         ("theme_focus", "题材"),
         ("focus_direction", "资金"),
@@ -300,7 +321,7 @@ def fmt_ai_summary(data):
             # 新闻摘要截断避免过长
             if len(val) > 60:
                 val = val[:57] + "..."
-            lines.append("> - **%s**: %s" % (label, val))
+            lines.append(f"> - **{label}**: {val}")
     return "\n".join(lines)
 
 
@@ -318,30 +339,30 @@ def fmt_comparison(data):
     if today_lu is not None and yd_lu is not None:
         diff_lu = today_lu - yd_lu
         sign_lu = "+" if diff_lu > 0 else ""
-        lines.append("涨停 %s（昨 %s，%s%s）" % (today_lu, yd_lu, sign_lu, diff_lu))
+        lines.append(f"涨停 {today_lu}（昨 {yd_lu}，{sign_lu}{diff_lu}）")
 
     today_si = m.get("sentiment_index")
     yd_si = yd.get("sentiment_index")
     if today_si is not None and yd_si is not None:
         diff_si = round(today_si - yd_si, 1)
         sign_si = "+" if diff_si > 0 else ""
-        lines.append("情绪 %s%%（昨 %s%%，%s%s%%）" % (today_si, yd_si, sign_si, diff_si))
+        lines.append(f"情绪 {today_si}%（昨 {yd_si}%，{sign_si}{diff_si}%）")
 
     today_fr = m.get("fried")
     yd_fr = yd.get("fried")
     if today_fr is not None and yd_fr is not None:
         diff_fr = today_fr - yd_fr
         sign_fr = "+" if diff_fr > 0 else ""
-        lines.append("炸板 %s（昨 %s，%s%s）" % (today_fr, yd_fr, sign_fr, diff_fr))
+        lines.append(f"炸板 {today_fr}（昨 {yd_fr}，{sign_fr}{diff_fr}）")
 
     trend_label = comp.get("trend_label", "")
     if trend_label:
         lines.append("")
-        lines.append("趋势判断: **%s**" % trend_label)
+        lines.append(f"趋势判断: **{trend_label}**")
 
     trend_url = comp.get("trend_url", "")
     if trend_url:
-        lines.append("近10日趋势图 → %s" % trend_url)
+        lines.append(f"近10日趋势图 → {trend_url}")
 
     return "\n".join(lines)
 
@@ -362,29 +383,31 @@ def fmt_signals(data):
     ]:
         val = sig.get(key)
         if val is not None:
-            counts.append("· %s: %s只" % (label, val))
+            counts.append(f"· {label}: {val}只")
     if counts:
-        total = sum(
-            sig.get(k, 0) for k in ("jiuzhuan", "multi_factor", "emotion_sync")
-        )
+        total = sum(sig.get(k, 0) for k in ("jiuzhuan", "multi_factor", "emotion_sync"))
         is_free_today = datetime.now().weekday() == 0  # 周一
-        free_hint = "今天免费查看名单" if is_free_today else "%s免费查看名单" % sig.get("free_day", "每周一")
-        lines.append("选股信号 %s个（%s）" % (total, free_hint))
+        free_hint = (
+            "今天免费查看名单"
+            if is_free_today
+            else "{}免费查看名单".format(sig.get("free_day", "每周一"))
+        )
+        lines.append(f"选股信号 {total}个（{free_hint}）")
         lines.extend(counts)
         xuangu_url = sig.get("xuangu_url", "https://hhxg.top/xuangu.html")
-        lines.append("→ %s" % xuangu_url)
+        lines.append(f"→ {xuangu_url}")
         lines.append("")
 
     # 钩子③ 策略回溯
     backtest_url = sig.get("backtest_url", "https://hhxg.top/xuangu.html#backtest")
     lines.append("策略回溯（自定义信号组合 + 历史胜率）")
-    lines.append("→ %s" % backtest_url)
+    lines.append(f"→ {backtest_url}")
     lines.append("")
 
     # 钩子④ 异动预警
     vol_count = sig.get("volatility_alert")
     if vol_count is not None:
-        lines.append("异动预警 %s只 → https://hhxg.top/yidong.html" % vol_count)
+        lines.append(f"异动预警 {vol_count}只 → https://hhxg.top/yidong.html")
 
     lines.append("ETF工具 → https://hhxg.top/etf.html")
 
@@ -397,13 +420,16 @@ def fmt_footer(data):
     lines = ["---", ""]
     full = links.get("full_report", {})
     url = full.get("url", "https://hhxg.top")
-    lines.append("详细数据请查看 %s" % url)
+    lines.append(f"详细数据请查看 {url}")
     lines.append("")
     for key in ("stock_picker", "hotmoney", "margin", "etf", "volatility"):
         lk = links.get(key, {})
         if lk.get("title") and lk.get("url"):
-            lines.append("· %s → %s" % (lk["title"], lk["url"]))
-    if not any(links.get(k) for k in ("stock_picker", "hotmoney", "margin", "etf", "volatility")):
+            lines.append("· {} → {}".format(lk["title"], lk["url"]))
+    if not any(
+        links.get(k)
+        for k in ("stock_picker", "hotmoney", "margin", "etf", "volatility")
+    ):
         lines.append("· 更多工具 → https://hhxg.top")
     return "\n".join(lines)
 
@@ -411,7 +437,7 @@ def fmt_footer(data):
 def fmt_snapshot(data):
     """完整快照 — 标准输出模板"""
     parts = [
-        "# 恢恢量化 · %s" % data.get("date", ""),
+        "# 恢恢量化 · {}".format(data.get("date", "")),
         "",
     ]
     summary = fmt_ai_summary(data)
@@ -422,7 +448,7 @@ def fmt_snapshot(data):
     sep = "\n\n---\n\n"
 
     # ━━ 今日完整数据 ━━
-    parts.append(fmt_market(data))      # 含今日 vs 昨日对比
+    parts.append(fmt_market(data))  # 含今日 vs 昨日对比
     parts.append(sep)
     parts.append(fmt_themes(data))
     parts.append(sep)
@@ -469,8 +495,8 @@ def main():
 
     section = args[0] if args else "all"
     if section not in SECTIONS:
-        print("未知板块: %s" % section)
-        print("可选: %s" % ", ".join(SECTIONS))
+        print(f"未知板块: {section}")
+        print("可选: {}".format(", ".join(SECTIONS)))
         sys.exit(1)
 
     try:
@@ -487,8 +513,8 @@ def main():
     today = datetime.now().strftime("%Y-%m-%d")
     if data_date and data_date != today:
         print(
-            "NOTE: 以下为 %s 的数据（最近交易日）。"
-            "每个交易日盘后约 20:00 更新，今日数据尚未发布。\n" % data_date,
+            f"NOTE: 以下为 {data_date} 的数据（最近交易日）。"
+            "每个交易日盘后约 20:00 更新，今日数据尚未发布。\n",
             file=sys.stderr,
         )
 
