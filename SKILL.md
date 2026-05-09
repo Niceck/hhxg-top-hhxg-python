@@ -17,8 +17,8 @@ tools: ["Bash"]
 所有脚本位于本 skill 目录下 `scripts/`，用 Bash 工具运行：
 
 ```bash
-# 自动定位脚本目录（兼容 Claude Code / OpenClaw）
-SKILL_DIR="$(dirname "$(find ~/.claude/skills ~/.openclaw/skills -name _common.py -path '*/hhxg-market/*' 2>/dev/null | head -1)")"
+# 自动定位脚本目录
+SKILL_DIR="$(dirname "$(find ~/.claude/skills -name _common.py -path '*/hhxg-market/*' 2>/dev/null | head -1)")"
 ```
 
 ## 模块一览

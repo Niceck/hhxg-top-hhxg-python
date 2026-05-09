@@ -1,6 +1,6 @@
 # hhxg-market — A 股量化数据助手
 
-> Claude Code / OpenClaw 技能：零配置获取 A 股日报、日历、融资融券、实时快讯
+> Claude Code 技能：零配置获取 A 股日报、日历、融资融券、实时快讯
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Data by hhxg.top](https://img.shields.io/badge/data-hhxg.top-blue.svg)](https://hhxg.top)
@@ -11,7 +11,7 @@
 
 ## 什么是 hhxg-market？
 
-一个 [Claude Code](https://claude.ai/code) / [OpenClaw](https://github.com/nicepkg/openclaw) 技能（Skill），安装后直接对 AI 说「今天 A 股怎么样」、「融资融券数据」、「明天是交易日吗」就能获取对应数据。
+一个 [Claude Code](https://claude.ai/code) 技能（Skill），安装后直接对 AI 说「今天 A 股怎么样」、「融资融券数据」、「明天是交易日吗」就能获取对应数据。
 
 **无需注册、无需 Token、无需安装任何 Python 包**，仅需 Python 3 标准库。
 
@@ -29,26 +29,16 @@
 
 ## 安装
 
-**Claude Code：**
 ```bash
 git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git /tmp/hhxg-market && \
   rm -rf ~/.claude/skills/hhxg-market && \
   mv /tmp/hhxg-market ~/.claude/skills/hhxg-market
 ```
 
-**OpenClaw：**
-```bash
-git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git /tmp/hhxg-market && \
-  rm -rf ~/.openclaw/skills/hhxg-market && \
-  mv /tmp/hhxg-market ~/.openclaw/skills/hhxg-market
-```
-
 ### 更新
 
 ```bash
 cd ~/.claude/skills/hhxg-market && git pull
-# OpenClaw:
-cd ~/.openclaw/skills/hhxg-market && git pull
 ```
 
 ### 卸载
@@ -95,8 +85,8 @@ rm -rf ~/.claude/skills/hhxg-market
 ### 终端独立使用
 
 ```bash
-# 定位脚本目录（兼容 Claude Code / OpenClaw）
-SKILL_DIR=$(find ~/.claude/skills ~/.openclaw/skills \
+# 定位脚本目录
+SKILL_DIR=$(find ~/.claude/skills \
   -name _common.py -path '*/hhxg-market/*' 2>/dev/null \
   | head -1 | xargs dirname)
 
@@ -156,7 +146,7 @@ python3 "$SKILL_DIR/margin.py" --json
 ```
 ├── README.md
 ├── LICENSE
-├── SKILL.md                  # Skill 定义文件（Claude Code / OpenClaw 读取）
+├── SKILL.md                  # Skill 定义文件（Claude Code 读取）
 ├── openapi.yaml              # OpenAPI 3.1 规范（GPT Actions / Dify / Coze 使用）
 ├── scripts/
 │   ├── _common.py            # 共用工具（HTTP、本地缓存、schema 检查）
