@@ -163,9 +163,13 @@ def fmt_ladder(data):
         count = level.get("count", len(stocks))
         fail_count = level.get("fail_count", 0)
 
-        # 本级晋级率：key=boards 表示「boards板→boards+1板」的成功率
-        rate = rates.get(str(boards), "")
-        rate_str = f"  · 晋级率 {rate} →{int(boards) + 1}板" if rate else ""
+        # 本级晋级率：levels[boards] 展示「昨日 boards-1 板股票的今日晋级表现」，
+        # rates_map 按源层级索引 → 取 rates[boards-1]（首板层取 rates["0"] 即 0→1 板）
+        try:
+            rate = rates.get(str(int(boards) - 1), "")
+        except (TypeError, ValueError):
+            rate = ""
+        rate_str = f"  · 晋级率 {rate}" if rate else ""
 
         # 区分晋级成功和失败的股票
         success_stocks = [s for s in stocks if s.get("is_success", True)]
