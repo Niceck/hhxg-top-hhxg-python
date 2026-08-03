@@ -1,6 +1,6 @@
 # hhxg-market — A 股量化数据助手
 
-> Claude Code 技能：零配置获取 A 股日报、日历、融资融券、实时快讯
+> Claude Code 技能：零配置获取 A 股日报、日历、融资融券、实时快讯、北向资金、题材热度、董秘问答、量化策略与风险预警
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Data by hhxg.top](https://img.shields.io/badge/data-hhxg.top-blue.svg)](https://hhxg.top)
@@ -31,6 +31,7 @@
 
 ```bash
 git clone --depth 1 https://github.com/Niceck/hhxg-top-hhxg-python.git /tmp/hhxg-market && \
+  mkdir -p ~/.claude/skills && \
   rm -rf ~/.claude/skills/hhxg-market && \
   mv /tmp/hhxg-market ~/.claude/skills/hhxg-market
 ```
@@ -57,6 +58,11 @@ rm -rf ~/.claude/skills/hhxg-market
 | A 股日历 | `calendar.py` | 交易日查询、限售解禁、业绩预告、期货交割日 |
 | 融资融券 | `margin.py` | 近 7 日余额变化、融资净买入/净卖出 TOP |
 | 实时快讯 | `news.py` | 财经快讯流（按时间倒序） |
+| 北向资金 | `northbound.py` | 近 7 日沪深港通资金流向（北向/南向/沪股通/深股通） |
+| 题材概念 | `theme.py` | 热度榜 + 概念链路（龙头映射/共现关联/related 查询） |
+| 董秘问答 | `dongmi.py` | 7 日 QA 流水 + 30 日 TOP 被问股/热门话题 + 个股查询 |
+| 量化策略 | `strategy.py` | 策略审计 + 最新信号 + 历史胜率 + 游资席位持仓 |
+| 共振风险 | `resonance.py` | 跨源共振信号 + 4 类风险预警（暴跌/出货/见顶/高换手） |
 
 ---
 
@@ -81,6 +87,11 @@ rm -rf ~/.claude/skills/hhxg-market
 | 日历 | 今天是交易日吗、明天开盘吗、下周解禁、交割日、财报季 |
 | 两融 | 融资融券、两融、两融数据、融资净买入、融资余额 |
 | 快讯 | 最新快讯、财经新闻、焦点新闻、实时新闻 |
+| 北向 | 北向资金、外资流入、沪股通、深股通、沪深港通 |
+| 题材概念 | 题材热度、概念链、题材龙头、概念排名 |
+| 董秘 | 董秘问答、投资者互动、热门提问、XX董秘说了什么 |
+| 选股 | 量化选股、选股策略、选股信号、策略胜率、游资席位 |
+| 共振风险 | 共振信号、多源确认、风险警报、见顶、暴跌 |
 
 ### 终端独立使用
 
@@ -96,6 +107,11 @@ python3 "$SKILL_DIR/fetch_snapshot.py" themes    # 热门题材
 python3 "$SKILL_DIR/calendar.py"                 # 本周日历
 python3 "$SKILL_DIR/margin.py"                   # 融资融券
 python3 "$SKILL_DIR/news.py" 30                  # 最新30条快讯
+python3 "$SKILL_DIR/northbound.py"               # 北向资金
+python3 "$SKILL_DIR/theme.py" ranking            # 题材热度 TOP 30
+python3 "$SKILL_DIR/dongmi.py" top               # 董秘问答 TOP
+python3 "$SKILL_DIR/strategy.py" stats           # 策略胜率统计
+python3 "$SKILL_DIR/resonance.py"                # 共振信号 + 风险警报
 
 # 所有脚本支持 --json 输出原始数据
 python3 "$SKILL_DIR/margin.py" --json
@@ -146,6 +162,7 @@ python3 "$SKILL_DIR/margin.py" --json
 ```
 ├── README.md
 ├── LICENSE
+├── CHANGELOG.md              # 版本变更记录
 ├── SKILL.md                  # Skill 定义文件（Claude Code 读取）
 ├── openapi.yaml              # OpenAPI 3.1 规范（GPT Actions / Dify / Coze 使用）
 ├── scripts/
@@ -153,7 +170,12 @@ python3 "$SKILL_DIR/margin.py" --json
 │   ├── fetch_snapshot.py     # 日报快照
 │   ├── calendar.py           # A 股日历
 │   ├── margin.py             # 融资融券
-│   └── news.py               # 实时快讯
+│   ├── news.py               # 实时快讯
+│   ├── northbound.py         # 北向资金
+│   ├── theme.py              # 题材概念热度
+│   ├── dongmi.py             # 董秘问答
+│   ├── strategy.py           # 量化策略
+│   └── resonance.py          # 共振信号 + 风险警报
 └── references/
     └── data-schema.md        # JSON 字段结构说明
 ```

@@ -23,7 +23,7 @@ import sys
 from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _common import fetch_json, check_schema, print_cache_hint
+from _common import check_schema, fetch_json, print_cache_hint
 
 
 def fetch():

@@ -210,3 +210,149 @@ URL: `news/n0.json`
 | `t` | 时间 ISO 格式 |
 | `cat` | 分类标签 |
 | `title` | 标题 |
+
+---
+
+## 五、北向资金（northbound.py）
+
+URL: `assistant/recent_northbound_7d.json`
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `scope` | string | 固定 `"northbound"` |
+| `generated_at` | string | 生成时间 |
+| `window` | object | `{trading_days, dates, start, end}` |
+| `stats` | object | 7 日统计（见下） |
+| `series` | array | 每日明细，**按日期降序**（最新在 `[0]`） |
+
+### stats
+
+| 字段 | 说明 |
+|------|------|
+| `total_inflow_7d_yi` | 7 日北向合计(亿) |
+| `avg_daily_yi` | 日均(亿) |
+| `max_single_day_yi` / `min_single_day_yi` | 单日最高/最低(亿) |
+| `consecutive_inflow_days` | 连续活跃天数 |
+| `net_inflow_days` / `net_outflow_days` | 活跃/回落天数 |
+
+### series 元素
+
+`{date, north_in_yi, south_in_yi, hgt_yi, sgt_yi}`
+
+> ⚠️ 口径：2024-08 起接口口径变更，`north_in_yi` 恒为正，仅反映外资成交
+> 活跃度，不代表真实净流入方向；`south_in_yi` 为累计存量值，非日度净流入。
+
+---
+
+## 六、题材概念（theme.py）
+
+热度榜 URL: `assistant/recent_theme_latest.json`
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `latest_date` | string | 数据日期 |
+| `items` | array | 题材榜（按游资参与数 → 当日涨停数降序） |
+
+### items 元素
+
+| 字段 | 说明 |
+|------|------|
+| `name` | 题材/概念名称 |
+| `yz` | 游资参与数 |
+| `zt` | 当日涨停数 |
+| `avg10` | 近 10 日平均涨停数（上游暂未提供，恒为 null，脚本不展示） |
+| `ratio` | 涨停占比（0-1 浮点） |
+
+概念链 URL: `assistant/concept_chain_latest.json`
+
+| 字段 | 说明 |
+|------|------|
+| `stats` | `{total_concepts, total_leaders, total_industries, window_days}` |
+| `top.concepts` | TOP 概念 `[{name, limitup_total, active_days, max_lianban}]` |
+| `top.leaders` | TOP 龙头 `[{code, name, industry, limitup_days, max_lianban, score}]` |
+| `top.concept_to_leaders` | 概念 → 龙头映射（值为龙头对象数组） |
+| `top.industry_to_concepts` | 行业 → 概念映射 `{行业: [{name, count}]}` |
+| `related` | 概念共现映射 `{概念: [{name, count}]}` |
+
+---
+
+## 七、董秘问答（dongmi.py）
+
+7 日流水 URL: `assistant/recent_dongmi_7d.json`
+
+| 字段 | 说明 |
+|------|------|
+| `window` | `{trading_days, dates, start, end}` |
+| `stats` | `{records, top_names: [{name, count}]}` |
+| `counts_by_date` | 每日条数映射 |
+| `records` | QA 流水 `[{t, date, name, q, a}]`（Q/A 已截断） |
+
+30 日索引 URL: `assistant/dongmi_full_30d.json`
+
+| 字段 | 说明 |
+|------|------|
+| `stats` | `{total_records, unique_stocks, date_range}` |
+| `top_stocks` | TOP 被问股 `[{股票, 问答数}]` |
+| `hot_topics` | 热门话题 `[{话题, 命中数}]` |
+| `stock_qa_index` | 按股票聚合的 QA 索引（仅高热度个股） |
+
+---
+
+## 八、量化策略（strategy.py）
+
+策略审计 URL: `xuangu/preset_audit.json`
+
+| 字段 | 说明 |
+|------|------|
+| `asof_used` | 审计基准日 |
+| `universe_size` | 选股宇宙股票数 |
+| `summary` | `{preset_total, coverage_pass, coverage_fail}` |
+| `presets` | 各策略 `[{key, label, coverage_check, asof_hits, ...}]` |
+
+游资席位 URL: `xuangu/hotmoney_seats.json` — `{席位名: [ts_code, ...]}` 映射。
+
+最新信号 URL: `assistant/recent_strategy_latest.json`
+
+| 字段 | 说明 |
+|------|------|
+| `latest_strategy_date` | 策略日期 |
+| `summary` | `{pending, holding, cleared}` 数量汇总 |
+| `pending` | 待开仓 `[{name, date}]` |
+| `holding_top` | 持仓盈亏 TOP `[{name, buy_date, pnl}]` |
+| `cleared_recent` | 近期清仓 `[{name, buy_date, sell_date, ret}]` |
+
+历史统计 URL: `assistant/strategy_full_stats.json`
+
+| 字段 | 说明 |
+|------|------|
+| `stats` | `{total, wins, losses, even, win_rate, avg_return, median_return, max_return, min_return}`（`win_rate` 为字符串如 `"33.1%"`） |
+| `distribution` | 收益区间分布映射 |
+| `monthly` | 月度表现 `[{月份, 笔数, 均值, 胜率}]` |
+| `top_winners` / `top_losers` | 历史最佳/最差 `[{股票名称, 买入日期, 清仓日期, 保底收益}]` |
+| `recent_30d` | `{笔数, 胜率, 均值}` |
+
+---
+
+## 九、共振 + 风险（resonance.py）
+
+共振信号 URL: `assistant/resonance_latest.json`
+
+| 字段 | 说明 |
+|------|------|
+| `data_date` | 数据日期 |
+| `stats` | `{total, triple_plus, min_categories, by_category, missing_sources}`（`missing_sources` 非空 = 部分数据源缺失，信号可能少报） |
+| `signals` | 信号列表（按加权共振分降序，元素含 `hotmoney_seats` 席位数组） |
+
+signals 元素: `{code, name, industry, categories, category_count,
+signal_strength, score, details, warnings}`；`categories` 取值
+`hotmoney`(龙虎榜) / `strategy`(策略) / `theme`(题材) / `indicator`(指标)。
+
+风险警报 URL: `assistant/recent_risk_alerts_latest.json`
+
+| 字段 | 说明 |
+|------|------|
+| `stats` | `{total_universe, top_n, amount_p70_yi, counts, total_counts}`；⚠️ `counts` 是 top_n 截断后的榜单长度，**全市场命中数必须用 `total_counts`** |
+| `alerts` | 4 桶预警：`crash`(暴跌) / `distribution`(巨量出货) / `nineturn_top_warning`(九转见顶) / `high_turnover_drop`(高换手放量下跌) |
+
+alerts 桶元素: `{code, name, industry, pct, close, vol_ratio, turnover,
+amount_yi, nineturn}`

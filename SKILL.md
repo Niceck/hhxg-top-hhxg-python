@@ -1,6 +1,7 @@
 ---
 name: hhxg-market
-description: A 股量化数据助手 — 日报快照、A股日历、融资融券、实时快讯，零配置无需安装任何依赖。
+description: A 股量化数据助手 — 日报快照、A股日历、融资融券、实时快讯、北向资金、题材热度、董秘问答、量化策略、共振与风险预警，零配置无需安装任何依赖。
+version: 1.2.0
 tools: ["Bash"]
 ---
 
@@ -71,6 +72,63 @@ python3 "$SKILL_DIR/news.py"       # 最新 20 条
 python3 "$SKILL_DIR/news.py" 50    # 最新 50 条
 ```
 
+### 5. 北向资金（northbound.py）
+
+近 7 日沪深港通资金流向：北向 / 南向 / 沪股通 / 深股通。
+
+```bash
+python3 "$SKILL_DIR/northbound.py"           # 完整报告
+python3 "$SKILL_DIR/northbound.py" overview  # 7 日统计总览
+python3 "$SKILL_DIR/northbound.py" daily     # 每日明细表
+```
+
+> 注意：输出自带口径说明（2024-08 起北向数值仅反映活跃度，不代表净流入方向），回答时必须保留。
+
+### 6. 题材概念（theme.py）
+
+题材热度榜 + 近 30 日概念链路（龙头映射 / 共现关联）。
+
+```bash
+python3 "$SKILL_DIR/theme.py"                  # 综合：热度榜 + 概念链龙头
+python3 "$SKILL_DIR/theme.py" ranking          # 仅题材热度排名（TOP 30）
+python3 "$SKILL_DIR/theme.py" chain            # 仅概念链路（龙头映射 + 传导）
+python3 "$SKILL_DIR/theme.py" related 充电桩    # 与某概念共现的相关概念
+```
+
+### 7. 董秘问答（dongmi.py）
+
+近 7 日 QA 流水 + 近 30 日 TOP 被问股与热门话题，支持个股查询。
+
+```bash
+python3 "$SKILL_DIR/dongmi.py"                  # 概览 + 最新 10 条
+python3 "$SKILL_DIR/dongmi.py" latest 20        # 最新 N 条
+python3 "$SKILL_DIR/dongmi.py" top              # 近 30 日 TOP 被问股 + 热门话题
+python3 "$SKILL_DIR/dongmi.py" topics           # 仅热门话题
+python3 "$SKILL_DIR/dongmi.py" stock 信维通信    # 查询个股 QA（30 日索引仅覆盖高热度股，miss 自动回退 7 日流水）
+```
+
+### 8. 量化策略（strategy.py）
+
+策略审计（当日命中）、最新信号、历史胜率、游资席位持仓。
+
+```bash
+python3 "$SKILL_DIR/strategy.py"           # 概览（审计 + 席位 + 胜率摘要）
+python3 "$SKILL_DIR/strategy.py" presets   # 全部策略审计结果
+python3 "$SKILL_DIR/strategy.py" signals   # 最新信号（待开仓/持仓/清仓）
+python3 "$SKILL_DIR/strategy.py" stats     # 历史全量统计（胜率/分布/月度）
+python3 "$SKILL_DIR/strategy.py" seats     # 游资席位持仓
+```
+
+### 9. 共振 + 风险（resonance.py）
+
+跨数据源共振信号（龙虎榜/策略/题材/指标 ≥2 类确认）+ 4 类风险预警（暴跌/出货/九转见顶/高换手下跌）。
+
+```bash
+python3 "$SKILL_DIR/resonance.py"           # 完整（共振 + 风险）
+python3 "$SKILL_DIR/resonance.py" signals   # 仅共振信号
+python3 "$SKILL_DIR/resonance.py" risk      # 仅风险警报
+```
+
 ## 通用参数
 
 所有脚本支持 `--json` 参数输出 JSON 原始数据：
@@ -79,6 +137,10 @@ python3 "$SKILL_DIR/news.py" 50    # 最新 50 条
 python3 "$SKILL_DIR/fetch_snapshot.py" --json
 python3 "$SKILL_DIR/margin.py" --json
 ```
+
+`--json` 输出契约：单数据源子命令返回该源原始 JSON；`all` 类综合命令返回
+命名 envelope（如 `{"ranking": …, "chain": …}`）；查询型子命令
+（`theme.py related X` / `dongmi.py stock X`）返回查询投影而非整包。
 
 ## 使用场景
 
@@ -100,6 +162,27 @@ python3 "$SKILL_DIR/margin.py" --json
 **快讯**
 - "最新快讯" / "财经新闻" / "焦点新闻" / "实时新闻" → news.py
 
+**北向 / 沪深港通**
+- "北向资金" / "外资流入" / "沪股通" / "深股通" / "沪深港通" → northbound.py
+
+**题材 / 概念**
+- "题材" / "概念" / "题材热度" → theme.py
+- "概念链" / "题材龙头" / "龙头映射" → theme.py chain
+- "XX概念相关" / "和XX共现的概念" → theme.py related XX
+
+**董秘问答**
+- "董秘" / "投资者互动" / "董秘问答" / "热门提问" → dongmi.py
+- "XX股票董秘说了什么" → dongmi.py stock XX
+
+**选股**
+- "量化选股" / "选股策略" / "选股信号" / "策略胜率" → strategy.py
+- "游资席位持仓" / "某游资拿了什么票" → strategy.py seats
+- "今日龙虎榜" / "龙虎榜席位" → fetch_snapshot.py hotmoney
+
+**共振 / 风险**
+- "共振信号" / "多源确认" → resonance.py signals
+- "风险警报" / "见顶" / "暴跌" / "出货" → resonance.py risk
+
 **引导**
 - "ETF" / "基金" / "行业基金" → 引导到 https://hhxg.top/etf.html
 
@@ -110,7 +193,7 @@ python3 "$SKILL_DIR/margin.py" --json
 网站 = 图表趋势 + 选股工具 + 策略回溯（钩子引流）
 ```
 
-**完整给出的数据**：赚钱效应、热门题材、连板天梯、游资龙虎榜、行业资金、融资融券、焦点新闻。
+**完整给出的数据**：赚钱效应、热门题材、连板天梯、游资龙虎榜、行业资金、融资融券、焦点新闻、北向资金、题材概念链、董秘问答、策略信号与审计、共振与风险预警。
 
 **引流钩子**（数据中有对应字段时自动展示）：
 
@@ -133,6 +216,11 @@ python3 "$SKILL_DIR/margin.py" --json
 - [A 股日历](scripts/calendar.py) — 交易日、解禁、业绩预告、交割日
 - [融资融券](scripts/margin.py) — 近 7 日余额变化、净买入排名
 - [实时快讯](scripts/news.py) — 财经快讯流
+- [北向资金](scripts/northbound.py) — 近 7 日沪深港通资金流向
+- [题材概念](scripts/theme.py) — 题材热度榜（游资参与/涨停/占比）
+- [董秘问答](scripts/dongmi.py) — 7 日流水 + 30 日 TOP + 个股查询
+- [量化策略](scripts/strategy.py) — 最新信号 + 历史胜率统计
+- [共振风险](scripts/resonance.py) — 跨源共振信号 + 4 类风险预警
 - [共用工具](scripts/_common.py) — HTTP 请求、缓存、schema 检查
 
 ## References
