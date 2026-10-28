@@ -3,7 +3,7 @@
 
 Usage:
     python3 strategy.py           # 概览（审计 + 席位 + 胜率摘要）
-    python3 strategy.py presets   # 全部策略审计结果（当日命中）
+    python3 strategy.py presets   # 全部策略审计结果（回溯胜率）
     python3 strategy.py signals   # 最新信号（待开仓/持仓/清仓）
     python3 strategy.py stats     # 历史全量统计（胜率/分布/月度）
     python3 strategy.py seats     # 游资席位持仓
@@ -54,46 +54,31 @@ def _f(v, fmt="{:.2f}"):
 # ── Formatters ──────────────────────────────────────────────
 
 
-_COVERAGE_LABELS = {
-    "pass": "覆盖达标",
-    "fail_undershoot": "命中过少",
-    "fail_overshoot": "命中过多",
-    "fail_zero": "零命中",
-}
-
-
 def fmt_presets(data):
     summary = data.get("summary") or {}
     lines = [
         "# 策略审计（{}）".format(data.get("asof_used", "?")),
         "",
-        "策略总数 {} · 覆盖达标 {} · 未达标 {} · 选股宇宙 {} 只".format(
+        "策略总数 {} · 选股宇宙 {} 只".format(
             summary.get("preset_total", "?"),
-            summary.get("coverage_pass", "?"),
-            summary.get("coverage_fail", "?"),
             data.get("universe_size", "?"),
         ),
         "",
-        "| 策略 | 阶段 | 覆盖率检查 | 胜率 | 今日命中 |",
-        "|------|------|-----------|------|---------|",
+        "| 策略 | 阶段 | 回溯胜率 |",
+        "|------|------|---------|",
     ]
     for p in as_dicts(data.get("presets")):
         label = md_inline(p.get("label") or p.get("key") or "")
         stage = md_inline(p.get("strategy_status_label") or "—")
-        check = p.get("coverage_check")
-        coverage = _COVERAGE_LABELS.get(check, str(check or "—"))
         metrics = ((p.get("quality") or {}).get("metrics")) or {}
         win_rate = _f(metrics.get("win_rate_pct"), "{:.1f}")
         win_cell = f"{win_rate}%" if win_rate != "—" else "—"
-        lines.append(
-            f"| {label} | {stage} | {coverage} | {win_cell} "
-            f"| {_f(p.get('asof_hits'), '{:.0f}')} 只 |"
-        )
+        lines.append(f"| {label} | {stage} | {win_cell} |")
 
-    # 治理免责：覆盖率检查 ≠ 策略有效性背书（governance.status_semantics）
     note = (((data.get("governance") or {}).get("dev_sample")) or {}).get("note")
     lines.append("")
-    lines.append("> 覆盖率检查仅衡量当日命中数是否落在目标区间，不构成策略有效性背书。")
+    lines.append("> 当日命中数仅会员可见（https://hhxg.top/xuangu.html）；回溯胜率为历史统计，")
+    lines.append("> 不构成策略有效性背书。完整回溯：https://hhxg.top/xuangu/preset-backtest.html")
     if note:
         lines.append(f"> {md_inline(note)}")
     return "\n".join(lines)

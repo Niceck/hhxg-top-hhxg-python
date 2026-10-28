@@ -518,7 +518,7 @@ def main():
     if data_date and data_date != today:
         print(
             f"NOTE: 以下为 {data_date} 的数据（最近交易日）。"
-            "每个交易日盘后约 20:00 更新，今日数据尚未发布。\n",
+            "每个交易日 20:22 起更新、预计 20:30 前完成，今日数据尚未发布。\n",
             file=sys.stderr,
         )
 

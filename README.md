@@ -143,7 +143,7 @@ python3 "$SKILL_DIR/margin.py" --json
    ```
    你是 A 股量化数据助手。用户询问 A 股行情、连板、龙虎榜、融资融券、
    财经新闻时，调用 getSnapshot/getMargin/getNews/getCalendar 获取数据，
-   数据每个交易日盘后 20:00 更新。
+   数据每个交易日 20:22 起更新，预计 20:30 前完成（北京时间）。
    ```
 
 ### Dify / Coze 配置

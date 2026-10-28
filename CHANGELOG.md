@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.1 (2026-10-28)
+
+- **strategy.py `presets`**：不再显示当日命中数与覆盖率检查（当日命中仅会员可见），改为「策略 / 阶段 / 回溯胜率」表，附回溯研究页链接（公开回溯统计每周更新）；`references/data-schema.md` 同步——`jiuzhuan` / `multi_factor` / `emotion_sync` 恒为 `null`，`summary` 只剩 `preset_total`。
+- **更新时间口径**：README / SKILL.md / fetch_snapshot.py / openapi.yaml 统一为「交易日 20:22 起更新，预计 20:30 前完成（北京时间）」；两融数据为交易日上午约 09:05 更新上一交易日。
+- **openapi.yaml 1.1.0 → 1.3.0**：与站点公开的 https://hhxg.top/openapi.yaml 一致，新增付费数据 API（`/api/data/index` 目录、`/api/data/{scope}` Bearer token，Max 权益）与 `x-pricing` 套餐目录；原 4 个公开端点不变。
+
 ## v1.2.0 (2026-08-03)
 
 新增 5 个数据模块（脚本 4 → 9），与 [AI 集成页面](https://hhxg.top/skill.html) 宣传能力对齐：

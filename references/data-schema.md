@@ -127,9 +127,9 @@ seats.stocks 元素: `{name, net_yi}`
 
 | 字段 | 说明 |
 |------|------|
-| `jiuzhuan` | 九转信号命中数 |
-| `multi_factor` | 多因子评分>80 命中数 |
-| `emotion_sync` | 情绪共振信号命中数 |
+| `jiuzhuan` | 恒为 `null`（当日命中数为会员口径，2026-10-28 起不公开） |
+| `multi_factor` | 恒为 `null`（同上） |
+| `emotion_sync` | 恒为 `null`（同上） |
 | `volatility_alert` | 异动预警数 |
 | `free_day` | 免费日提示（如"每周一"） |
 | `xuangu_url` | 选股工具链接 |
@@ -306,8 +306,8 @@ URL: `assistant/recent_northbound_7d.json`
 |------|------|
 | `asof_used` | 审计基准日 |
 | `universe_size` | 选股宇宙股票数 |
-| `summary` | `{preset_total, coverage_pass, coverage_fail}` |
-| `presets` | 各策略 `[{key, label, coverage_check, asof_hits, ...}]` |
+| `summary` | `{preset_total}` |
+| `presets` | 各策略 `[{key, label, strategy_status_label, quality, backtest_ma_exit, ...}]`（2026-10-28 起不含当日命中数 / 覆盖率，当日命中仅会员可见） |
 
 游资席位 URL: `xuangu/hotmoney_seats.json` — `{席位名: [ts_code, ...]}` 映射。
 
