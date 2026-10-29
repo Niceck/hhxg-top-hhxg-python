@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.2 (2026-10-29)
+
+- **news.py 快讯改读每小时滚动的 `https://hhxg.top/api/news`**：站点静态 `news/n0.json` 现在一天只随全站构建更新 3 次，盘中最多落后约 6 小时；接口失败、返回结构不对或要超过 50 条时自动回落静态文件，stderr 会提示。
+- **`_common.fetch_json`** 接受 `https://hhxg.top/` 下的绝对地址（其他域名拒绝），相对路径行为不变。
+
 ## v1.2.1 (2026-10-28)
 
 - **strategy.py `presets`**：不再显示当日命中数与覆盖率检查（当日命中仅会员可见），改为「策略 / 阶段 / 回溯胜率」表，附回溯研究页链接（公开回溯统计每周更新）；`references/data-schema.md` 同步——`jiuzhuan` / `multi_factor` / `emotion_sync` 恒为 `null`，`summary` 只剩 `preset_total`。

@@ -35,7 +35,8 @@ if "calendar" not in sys.modules:
 import urllib.error  # noqa: E402
 import urllib.request  # noqa: E402
 
-BASE_URL = "https://hhxg.top/static/data"
+SITE_URL = "https://hhxg.top"
+BASE_URL = f"{SITE_URL}/static/data"
 CACHE_DIR = os.path.expanduser("~/.cache/hhxg-market")
 SUPPORTED_SCHEMA = 3
 HEADERS = {
@@ -48,9 +49,15 @@ _WS_RE = re.compile(r"\s+")
 def fetch_json(path, cache_name=None):
     """获取 JSON 数据，网络抖动自动重试一次，失败时用本地缓存兜底。
 
+    ``path`` 是 ``BASE_URL`` 下的相对路径，或 ``https://hhxg.top/`` 下的绝对地址（如 /api/news）。
     Returns (data, from_cache) 元组。
     """
-    url = f"{BASE_URL}/{path}"
+    if path.startswith("https://"):
+        if not path.startswith(SITE_URL + "/"):
+            raise ValueError(f"只允许 {SITE_URL} 下的地址：{path}")
+        url = path
+    else:
+        url = f"{BASE_URL}/{path}"
     cache_file = os.path.join(CACHE_DIR, cache_name) if cache_name else None
 
     last_err = None
