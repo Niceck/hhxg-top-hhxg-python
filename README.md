@@ -1,3 +1,5 @@
+> **⚠️ 已下线（2026-11-08）**：hhxg.top 的免费 AI 接入已全部停止。本技能依赖的公开端点（`/api/snapshot`、`/api/news`、`/api/margin`、`/api/calendar`）与公开数据目录已下线（返回 404 / 401），脚本不再能取到数据。AI / Agent 接入（MCP server、数据 API、自定义 API 投研助手）现为 **Max 会员**权益，见 <https://hhxg.top/developer.html>。本仓库已归档，仅作历史参考。
+
 # hhxg-market — A 股量化数据助手
 
 > Claude Code 技能：零配置获取 A 股日报、日历、融资融券、实时快讯、北向资金、题材热度、董秘问答、量化策略与风险预警
